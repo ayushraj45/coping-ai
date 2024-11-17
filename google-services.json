@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "886343704923",
+    "project_id": "coping-ai",
+    "storage_bucket": "coping-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886343704923:android:c5bb1d6a14c431c10bba7e",
+        "android_client_info": {
+          "package_name": "com.ayushrajp.copingai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886343704923-dbo40mq73v8crvtn40ho1fev1e1se7a8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChocMi0AHy9amfS-kdt-VFXcc-QQREGOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886343704923-dbo40mq73v8crvtn40ho1fev1e1se7a8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "886343704923-s02cf42fr1japtu0p25qi3glq34unugp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.coping.copingai"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886343704923:android:de873d86deb5c4050bba7e",
+        "android_client_info": {
+          "package_name": "com.coping.copingai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886343704923-dbo40mq73v8crvtn40ho1fev1e1se7a8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChocMi0AHy9amfS-kdt-VFXcc-QQREGOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886343704923-dbo40mq73v8crvtn40ho1fev1e1se7a8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "886343704923-s02cf42fr1japtu0p25qi3glq34unugp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.coping.copingai"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

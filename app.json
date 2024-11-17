@@ -9,13 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ayushrajp.copingai"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ayushrajp.copingai"
     },
     "web": {
       "bundler": "metro",
@@ -23,6 +27,18 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      [
+        "expo-build-properties",
+          {
+            "ios": {
+              "useFrameworks": "static",
+              "flipper": true
+            }
+          }
+        ], 
       "expo-router",
       [
         "expo-splash-screen",
@@ -36,6 +52,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "7fcc8b44-7fbd-4026-b84b-47a7d6e6b5cf"
+      }
+    },
+    "owner": "ayushrajp"
   }
 }
