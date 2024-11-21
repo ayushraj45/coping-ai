@@ -10,7 +10,7 @@ import Svg, {
 
 const NightButton = (props) => (
   <Svg
-    width={145}
+    width={142}
     height={80}
     fill="none"
     {...props}

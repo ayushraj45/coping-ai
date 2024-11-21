@@ -5,26 +5,144 @@ import EmotionMatrix from '../../components/EmotionMatrix'
 import MorningButton from '../../assets/icons/MorningButton'
 import NightButton from '../../assets/icons/Nightbutton'
 import VentButton from '../../assets/icons/VentButton'
-import Aspire from '../../assets/icons/Aspire.svg'
+import AddNew from '../../assets/icons/AddNew.svg'
+import InstaPromptList from '../../components/InstaPromptList'
 
 const homepage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [triggerHandle, setTriggerHandle] = useState(false);
   const [selectedButton, setSelectedButton] = useState(null); 
+  const [customFeeling, setCustomFeeling] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [userFreeEntry, setUserFreeEntry]= useState(0);
+  const [showSubsribeNotice, setShowSubscribeNotice ] = useState(false)
+
+  //const { addEntry, getGPTResponse, getGPTInstaPrompt, user, isSubscribed , canMakeEntry} = useGlobalContext();
+
 
   const isSelected = (buttonType) => 
     selectedButton === buttonType || 
   (selectedItem && selectedItem.listType === 'dailyButton' && selectedItem.type === buttonType) || (selectedButton === null && selectedItem === null);
 
+  const handleSelection = (item, listType) => {
+    setCustomFeeling('');
+    const newItem = { ...item, listType };
+    if(selectedItem && selectedItem.type === item.type && selectedItem.listType === listType && selectedItem.prompt === item.prompt){
+      setSelectedItem(null)
+    setSelectedButton(null);
+    }
+    else{
+    setSelectedItem(newItem);
+    setSelectedButton(null);
+    console.log(selectedItem); // log the updated value
+    }
+  };
+
+  const handleDailyEntry = (buttonType) => {
+    setCustomFeeling('');
+    setSelectedButton(buttonType);
+    if(buttonType === 'morning') {
+      handleSelection({ type: buttonType, listType: 'dailyButton', prompt: 'It is morning, help me aspire for things, prioritise and start my day with journaling'}, 'dailyButton');
+    }
+  else if (buttonType === 'night'){
+    handleSelection({ type: buttonType, listType: 'dailyButton', prompt: 'It is night, help me reflect, ask me about my day what I want to improve and other things and help conclude my day' }, 'dailyButton');
+  }
+  else if (buttonType === 'vent'){
+    handleSelection({ type: buttonType, listType: 'dailyButton', prompt: 'I want to vent or rant, ask me relevant questions and make this experience a mentally freeing but healthy for me, help me learn from my rants.' }, 'dailyButton');
+  }
+  };
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = now.toLocaleString('default', { month: 'short' });
+    const year = String(now.getFullYear()).slice(-2);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+  
+    return `${day}-${month}-${year}, ${hours}:${minutes}`;
+  };
+
+  const handleNewEntry = async () => {
+    //setIsloading(true);
+    setCustomFeeling('');
+    const allowEntry = await canMakeEntry();
+    if(allowEntry === false){
+      setShowSubscribeNotice(true);
+      setSelectedButton(null);
+      setSelectedItem(null);
+      //setIsloading(false);
+    }
+    else {
+    setIsloading(true);
+    console.log(selectedItem);
+    const currentDateTime = getCurrentDateTime();
+
+    const initialEntry = {
+      "userId": userId,
+      "title": currentDateTime,
+      "initFeeling": "",
+      "questions": [],
+      "answers": [],
+      "content": "",
+      "questionCount": 0
+    }   
+
+    const newEntryId = await addEntry(initialEntry);
+
+    if(newEntryId) {
+      if(selectedItem.listType === "instaprompt") {
+        try{
+          const data = await getGPTInstaPrompt(newEntryId, selectedItem.prompt);
+          if(data) {
+            setIsloading(false);
+            router.push({
+              pathname: `/entry/[id]`,
+              params: { id: newEntryId }
+            });
+            setSelectedItem(null)
+            setSelectedButton(null);
+          } 
+        } catch (error) {
+          console.log('failed to create new entry at instaprompt')
+          console.error(error)
+        }
+      }
+      else {
+        try{
+          const data = await getGPTResponse(newEntryId, selectedItem.prompt);
+          if(data) {
+            setIsloading(false);  
+            router.push({
+              pathname: `/aiConvo`,
+              params: { id: newEntryId, prompt: data.newQuestion, qCount: data.questionCount }
+            });
+            setSelectedItem(null)
+            setSelectedButton(null);
+          }
+          else console.log('something was not right at creating new ai convo.');
+        } catch (error) {
+          console.error(error);
+        }
+      } 
+    
+    } else {
+      console.log('failed to create new entry to begin with, so we never got new ID')
+    }
+  }
+  }
+
   return (
     <SafeAreaView style={styles.main}>
+      <View style={styles.upperSpace} />
       <View style={styles.topText}>
           <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Hello@User</Text>
         </View>
       <View style={{paddingVertical:5, marginTop:5, }}>
       <TextInput
         style={[{
-          marginVertical: 3,
+          marginVertical: RFPercentage(1),
           marginHorizontal: 12,
           backgroundColor: '#F1F1F1',
           borderRadius: 20,
@@ -34,7 +152,7 @@ const homepage = () => {
           opacity:0.4
         },
         !selectedItem && {
-          marginVertical: 3,
+          marginVertical: RFPercentage(1),
           marginHorizontal: 12,
           backgroundColor: '#F1F1F1',
           borderColor:'#011C2D',
@@ -45,7 +163,7 @@ const homepage = () => {
           paddingVertical: 10
       }]}
         placeholder='Start with anything...'
-        //editable={!selectedItem}        
+        editable={!selectedItem}        
         onChangeText={(text) => {
           //value={text};
         }}
@@ -79,10 +197,10 @@ const homepage = () => {
       </View>
       <View>
       <TextInput  
-             style={[ {marginVertical:10, marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,opacity:0.4}, !selectedItem && {marginVertical:10, marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,borderColor:'#011C2D',borderWidth:1, } ]}
+             style={[ {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,opacity:0.4}, !selectedItem && {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,borderColor:'#011C2D',borderWidth:1, } ]}
              placeholder='I feel...'
              
-             //editable={!selectedItem}
+             editable={!selectedItem}
              onChangeText={(text) => {
               
              }}
@@ -104,10 +222,10 @@ const homepage = () => {
       </View> 
 
       <View style={styles.topText}>
-          <Text style={{fontSize: RFPercentage(3)}} className="font-cMedium">Daily Journal</Text>
-        </View>
+        <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Daily Journal</Text>
+      </View>
 
-        <View style={styles.dailyButtons}>
+      <View style={styles.dailyButtons}>
         <ScrollView 
             horizontal={true}
             showsHorizontalScrollIndicator={false}
@@ -121,7 +239,7 @@ const homepage = () => {
              isSelected('morning') ? styles.selectedButton : styles.unselectedButton
             ]}
             >
-            <MorningButton/>
+            <MorningButton  />
           </TouchableOpacity>
           <TouchableOpacity 
           onPress={() => handleDailyEntry('night')}
@@ -130,7 +248,7 @@ const homepage = () => {
             isSelected('night') ? styles.selectedButton : styles.unselectedButton
           ]}
           >
-            <Aspire />
+            <NightButton />
           </TouchableOpacity>
           <TouchableOpacity 
           onPress={() => handleDailyEntry('vent')}
@@ -141,8 +259,37 @@ const homepage = () => {
           >
             <VentButton/>
           </TouchableOpacity>
-          </ScrollView>
-        </View>
+        </ScrollView>
+      </View>
+
+      <View style={styles.topText}>
+        <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Instant Prompts</Text>
+      </View>
+
+      <View>
+        <InstaPromptList
+          onPromptPress={(item) => handleSelection(item, 'instaprompt')}
+          selectedEmotion={selectedItem && selectedItem.listType === 'instaprompt' ? selectedItem : null}
+          isDisabled={selectedItem && selectedItem.listType !== 'instaprompt'}
+          />
+      </View>
+
+      <View style={styles.customButton}>
+        <View style={styles.AddNew}>
+        {selectedItem ? (
+          <TouchableOpacity onPress={handleNewEntry}>
+            <AddNew width={RFPercentage(8)} height={RFPercentage(8)}/>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.disabledAddNew}>
+            <AddNew width={RFPercentage(8)} height={RFPercentage(8)} />
+          </View>
+        )}
+      </View>  
+      <View style={styles.CustomText}>
+          <Text style={{fontSize: RFPercentage(2), fontFamily:'cMedium'}}>{selectedItem? 'Click on plus to get started' : 'Select an emotion or type something'}</Text>
+          </View>
+      </View>
       
     </SafeAreaView>
   )
@@ -158,12 +305,12 @@ const styles = StyleSheet.create({
   topText: {
     paddingLeft: 15,
     justifyContent:'center',
+    marginBottom:RFPercentage(1)
   },
   dailyButtons:{
     flexDirection: 'row',
-    //marginLeft:-15,
-    paddingTop:20,
-    maxHeight: '20%'
+    paddingTop:RFPercentage(1),
+    paddingHorizontal: 10,
   },
   selectedButton: {
     opacity: 1,
@@ -171,4 +318,25 @@ const styles = StyleSheet.create({
   unselectedButton: {
     opacity: 0.3,
   },
+  upperSpace: {
+    //flex:0.01
+  },
+  customButton:{
+   // flex:0.4,
+    flexDirection:'column',
+    justifyContent:'footer',
+  },
+  AddNew: {
+    flexDirection:'row',
+    alignSelf: 'center',
+  },
+  disabledAddNew: {
+    opacity: 0.5,
+  },
+  CustomText:{
+    flexDirection:'row',
+    alignSelf: 'center',
+    margin:7,
+  },
+
 })

@@ -28,6 +28,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
     alignItems: 'center',
     justifyContent: 'center',
+    marginVertical: RFPercentage(0.5),
+
   },
   text: {
     color: 'black',
