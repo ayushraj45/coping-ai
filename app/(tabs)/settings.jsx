@@ -4,12 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-//import { useGlobalContext } from '../context/GlobalProvider';
+import { useGlobalContext } from '../context/GlobalProvider';
 import FeedbackPrompt from '../../components/FeedbackPrompt';
 
 const settings = () => {
 
-  //const { setUser, setIsLoggedIn, logout } = useGlobalContext();
+  const { logout } = useGlobalContext();
   const [showFeedback, setShowFeedback] = useState(false);
 
   const onFeedbackPress = () => {

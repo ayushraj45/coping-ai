@@ -4,12 +4,14 @@ import SmallLogo from '../assets/icons/SmallLogo';
 import { Ionicons } from '@expo/vector-icons';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { useRouter } from 'expo-router';
-//import { useGlobalContext } from '../app/context/GlobalProvider';
+import { useGlobalContext } from '../app/context/GlobalProvider';
 
 const JournalEntryPane = ({title, content, id}) => {
   //console.log(id)
   const router = useRouter();
-  //const { deleteEntry , refreshUserData} = useGlobalContext();
+//  const { deleteEntry , refreshUserData} = useGlobalContext();
+  const { deleteEntry } = useGlobalContext();
+
 
   const handlePress = () => {
     console.log('Pressed entry with ID:', id);

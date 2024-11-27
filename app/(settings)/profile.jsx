@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileLogo from '../../assets/icons/ProfileLogo';
 import { Ionicons } from '@expo/vector-icons';
 import { RFPercentage } from 'react-native-responsive-fontsize';
-//import { useGlobalContext } from './context/GlobalProvider';
 import { useFocusEffect } from 'expo-router';
+import { useGlobalContext } from '../context/GlobalProvider';
 
 const profile = () => {
 
@@ -18,7 +18,7 @@ const profile = () => {
   const [value, setValue] = useState(2);
   const [tempValue, setTempValue] = useState(2);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
-  //const { user , isLoggedIn, updateUser, entriesLength, refreshUserData} = useGlobalContext();
+  const { user , isLoggedIn, updateUser, entriesLength, refreshUserData} = useGlobalContext();
   const [isLoading, setIsLoading] =useState(false)
   const [currentEntryLength, setCurrentEntryLength] = useState(`${value}`);
 
@@ -67,15 +67,15 @@ const setUpProfile = async () => {
     setCurrentEntryLength((thisUser.entryIds).length)
 }
 
-// useFocusEffect(
-//   useCallback(() => {
-//     setUpProfile();
-//   }, [])
-// );
+useFocusEffect(
+  useCallback(() => {
+    setUpProfile();
+  }, [])
+);
 
-// useEffect(() => {
-//   setUpProfile();
-// }, []);
+useEffect(() => {
+  setUpProfile();
+}, []);
 
 
 const daysSinceLastReset = (updatedAt) => {
@@ -118,21 +118,21 @@ return (
       
       <View style={styles.infoRow}>
         <Text style={{fontSize: RFPercentage(2)}}>Plan:</Text>
-        {/* <Text style={{fontSize: RFPercentage(2)}}>{subscriptionStatus}</Text> */}
+        <Text style={{fontSize: RFPercentage(2)}}>{subscriptionStatus}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={{fontSize: RFPercentage(2)}}>Total Entries:</Text>
-        {/* <Text style={{fontSize: RFPercentage(2)}}>{currentEntryLength}</Text> */}
+        <Text style={{fontSize: RFPercentage(2)}}>{currentEntryLength}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={{fontSize: RFPercentage(2)}}>Free Entries Left:</Text>
-        {/* <Text style={{fontSize: RFPercentage(2)}}>{remainingEntry}</Text> */}
+        <Text style={{fontSize: RFPercentage(2)}}>{remainingEntry}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={{fontSize: RFPercentage(2)}}>Free Entries Reset in</Text>
-        {/* <Text style={{fontSize: RFPercentage(2)}}>{updatedAt} Days</Text> */}
+        <Text style={{fontSize: RFPercentage(2)}}>{updatedAt} Days</Text>
       </View>
-      {/* <View style={styles.infoRow}>
+      <View style={styles.infoRow}>
         <Text style={{fontSize: RFPercentage(2)}}>Max Questions:</Text>
         <View style={styles.stepperContainer}>
           <TouchableOpacity 
@@ -149,13 +149,12 @@ return (
             <Ionicons name="add-circle-outline" size={24} color="black" />
           </TouchableOpacity>
       </View>
-      </View> */}
+      </View>
       <View style={styles.infoRow}>
         <View style={!enableEdit ? styles.button : styles.cancelbutton}>
-        {/* <TouchableOpacity onPress={handleEdit}>
+        <TouchableOpacity onPress={handleEdit}>
           {!enableEdit ? <Text style={{fontSize: RFPercentage(2)}} className="font-bSemi"> Edit </Text> : <Text style={{fontSize: RFPercentage(2)}} className="font-bSemi"> Cancel </Text>  }
-        </TouchableOpacity> */}
-
+        </TouchableOpacity>
         </View>
 
         <View style={enableEdit ? styles.button : styles.buttondisable}>

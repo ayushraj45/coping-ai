@@ -5,107 +5,50 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import SmallLogo from '../assets/icons/SmallLogo'
 import { Ionicons } from '@expo/vector-icons'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-//import { useGlobalContext } from './context/GlobalProvider'
+import { useGlobalContext } from './context/GlobalProvider'
 import RotatingLogoLoader from '../components/RotatingLogoLoader'
 
 const aiConvo = () => {
-//     const params = useLocalSearchParams();
-//     const [prompt, setPrompt] = useState('');
-//     const [entryID, setEntryID] = useState(params.id);
-//     const [question, setQuestion] = useState(params.prompt);
-//     const [text, setText] = useState('');
+     const params = useLocalSearchParams();
+     const [prompt, setPrompt] = useState('');
+     const [entryID, setEntryID] = useState(params.id);
+     const [question, setQuestion] = useState(params.prompt);
+     const [text, setText] = useState('');
 //     //const params = useLocalSearchParams();
-//     const router = useRouter();
-//     const {getGPTResponse, isLoading, user} = useGlobalContext();
+     const router = useRouter();
+     const {getGPTResponse, user} = useGlobalContext();
 //     // const maxQuestions = 3; //Set this from user! 
-//     const [qCount, setQCount] = useState(params.qCount)
+    const [qCount, setQCount] = useState(params.qCount)
      const textInputRef = useRef('');
 
-//     // useEffect(() => {
-         
-//     //         console.log('Params received at aiConvo: ', params);
-//     //         setQuestion(params.prompt)
-//     //         setEntryID(params.id)
-//     //         setQCount(params.qCount)
-        
-//     // }, []) 
-
-//     const handleNextPrompt = async () => {
+    const handleNextPrompt = async () => {
     
-//         const maxQuestions = user.maxQuestions;
-//         setPrompt(textInputRef.current)
+        const maxQuestions = user.maxQuestions;
+        setPrompt(textInputRef.current)
 
-//         try {
-//           const data = await getGPTResponse(entryID, textInputRef.current);
-//           setQCount(data.questionCount);
+        try {
+          const data = await getGPTResponse(entryID, textInputRef.current);
+          setQCount(data.questionCount);
     
-//           if (qCount < maxQuestions) {
-//             setQuestion(data.newQuestion);
-// // Clear user response after API call
-//             router.replace({
-//               pathname: `/aiConvo`,
-//               params: { id: entryID, prompt: data.newQuestion, qCount: data.questionCount },
-//               animation: 'none'
-//             });
-//           } else {
-//             router.replace({
-//               pathname: `/entry/[id]`,
-//               params: { id: entryID },
-//             });
-//             setPrompt(''); // Clear prompt on navigation to entry page
-//           }
-//         } catch (error) {
-//           console.error('Error fetching GPT response:', error);
-//         }
-//       };
-
-
-
-
-
-//     useEffect(() => {
-//     const fetchGPTResponse = async () => {
-//         const maxQuestions = 2
-       
-//             console.log('the question count is ' + qCount)
-//             console.log('this is going to gpt ' + entryID + ' ' + prompt)
-//             try {
-//                 const data = await getGPTResponse(entryID, prompt);
-//                 console.log('this came after hitting submit on text ' + data)
-//                 setQCount(data.questionCount)
-//                 if (qCount < maxQuestions) {
-//                 router.push({
-//                     pathname: `/aiConvo`,
-//                     params: { id: entryID, prompt: data.newQuestion, qCount: data.questionCount }})
-//                 }
-//                 else {
-//                     console.log('the question count is ' + qCount)
-//                     console.log('the entry is ' + entryID)
-        
-//                     router.push({
-//                         pathname: `/entry/[id]`,
-//                         params: { id: entryID }
-//                     });
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching GPT response:', error);
-//             }
-//         } 
-//     if (prompt){
-//         fetchGPTResponse();
-//     }
-// }, [prompt, qCount, entryID]) 
-
-
-    // const handleContentSizeChange = (event) => {
-    //     setText(event.nativeEvent.text);
-    //   };
-
-    // const handleNextPrompt = () => {
-    //     setPrompt(textInputRef.current)
-    //     console.log('text before setting prompt: ' + textInputRef.current)
-    //     console.log('this is the prompt now' + prompt)
-    // }  
+          if (qCount < maxQuestions) {
+            setQuestion(data.newQuestion);
+// Clear user response after API call
+            router.replace({
+              pathname: `/aiConvo`,
+              params: { id: entryID, prompt: data.newQuestion, qCount: data.questionCount },
+              animation: 'none'
+            });
+          } else {
+            router.replace({
+              pathname: `/entry/[id]`,
+              params: { id: entryID },
+            });
+            setPrompt(''); // Clear prompt on navigation to entry page
+          }
+        } catch (error) {
+          console.error('Error fetching GPT response:', error);
+        }
+      };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -124,7 +67,7 @@ const aiConvo = () => {
                   <Text 
                     style={[styles.questionText, { fontSize: RFPercentage(3), fontFamily:'bSemi' }]} 
                   >
-                  {/* {question} */} JI
+                  {question}
                   </Text>
                 </View>
               </View>
@@ -143,7 +86,7 @@ const aiConvo = () => {
                 />
                 <View style={styles.actionIconContainer}>
                   <TouchableOpacity 
-                  //onPress={() => handleNextPrompt()}
+                  onPress={() => handleNextPrompt()}
                   >
                     <Ionicons name="arrow-forward-outline" size={24} color="black" />
                   </TouchableOpacity>

@@ -1,6 +1,6 @@
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import AuthBG1 from '../../assets/icons/AuthBG1.svg'
-
+import auth from '@react-native-firebase/auth';
 import React, { useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
@@ -11,6 +11,23 @@ const login = () => {
     const [email, setEmail] = useState('')
     const [buttonText, setButtonText] = useState('')
       
+    const forgotPassword = async (email) => {
+        auth().sendPasswordResetEmail(email)
+        .then(() => {
+            console.log('password reset email sent ');
+            setButtonText("Reset email sent to " + email);
+        })
+        .catch(error => {
+  
+            if (error.code === 'auth/invalid-email') {
+                setErrorMessage('That email address is invalid!');
+            }
+            if (error.code === 'auth/user-not-found') {
+                setErrorMessage('User not found! Please register to get started!');
+            }
+            console.error(error);
+        });
+    }
 
     const { width , height } = Dimensions.get('window');
 

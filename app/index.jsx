@@ -1,19 +1,67 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { SafeAreaView, Text } from "react-native";
-import { View } from "react-native";
+import auth from '@react-native-firebase/auth';
+import { useGlobalContext } from "./context/GlobalProvider";
+import RotatingLogoLoader from "../components/RotatingLogoLoader";
+import { useEffect } from "react";
+import messaging from '@react-native-firebase/messaging';
 
 export default function Index() {
 
-    return (
-      <SafeAreaView>
-        <Text style={{fontFamily: 'bSemi'}}>Edit app/index.tsx to edit this screen.</Text>
-        <Link href="/homepage" style={{ color: 'blue'}}>Go to home</Link>
-        <Link href="/getStarted" style={{ color: 'blue'}}>Go to Get Started </Link>
-        <Link href="/OnboardScreenLayout" style={{ color: 'blue'}}>Go to Onboard Screen Layout page</Link>
-        <Link href="/aiConvo" style={{ color: 'blue'}}>Go to AI CONVO PAGE </Link>
+ 
+    const {user, initializing, isLoading} = useGlobalContext();
+
+    useEffect(() => {
+        console.log('user here at the first page ' + JSON.stringify(user))
+        if (initializing) return; // Wait for Firebase initialization
+        if (user) {
+          
+          router.replace("/homepage");
+        } else {
+            router.replace("/getStarted");
+        }
+      }, [user, initializing]);
+
+    //   useEffect(() => {
+    //     if(requestUserPermission()){
+    //         messaging().getToken().then((token) => {
+    //             console.log('token: ' + token);
+    //         })
+    //     } else {
+    //         console.log('permission not granted: ' + authStatus);
+    //     }
+    //   }, []);
+
+    //   const requestUserPermission = async () => {
+    //     const authStatus = await messaging().requestPermission();
+    //     const enabled =
+    //       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    //       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      
+    //     if (enabled) {
+    //       console.log('Authorization status:', authStatus);
+    //     }
+    //   }
+
+      if (isLoading) {
+        return (
+          <RotatingLogoLoader isLoading={isLoading} />
+        );
+      }
+    
+      return null; // Navigation handles the view
+    
+
+    // return (
+    //   <SafeAreaView>
+    //     <Text style={{fontFamily: 'bSemi'}}>Edit app/index.tsx to edit this screen.</Text>
+    //     <Link href="/homepage" style={{ color: 'blue'}}>Go to home</Link>
+    //     <Link href="/getStarted" style={{ color: 'blue'}}>Go to Get Started </Link>
+    //     <Link href="/OnboardScreenLayout" style={{ color: 'blue'}}>Go to Onboard Screen Layout page</Link>
+    //     <Link href="/aiConvo" style={{ color: 'blue'}}>Go to AI CONVO PAGE </Link>
 
       
 
-      </SafeAreaView> 
-    );
+    //   </SafeAreaView> 
+    // );
   }

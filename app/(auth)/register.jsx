@@ -1,10 +1,11 @@
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import AuthBG1 from '../../assets/icons/AuthBG1.svg'
-
+import auth from '@react-native-firebase/auth';
 import React, { useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
+import { useGlobalContext } from '../context/GlobalProvider';
 
 const register = () => {
 
@@ -12,8 +13,94 @@ const register = () => {
     const [password, setPassword] = useState('')
     const [username, setUsername] = useState('')
     const [loading, setLoading] = useState(false)  
+    const {login, API_URL} = useGlobalContext();
+    const [errorMessage, setErrorMessage] = useState(null)
 
     const { width , height } = Dimensions.get('window');
+
+    const signUp = async () => {
+        setLoading(true)
+        try {
+            const response = await auth()
+            .createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    console.log('User account created & signed in! ');
+                    loginSQL ();
+                })
+                .catch(error => {
+                    if (error.code === 'auth/email-already-in-use') {
+                        setErrorMessage('That email address is already in use!');
+                    }
+
+                    if (error.code === 'auth/invalid-email') {
+                        setErrorMessage('That email address is invalid!');
+                    }
+                    if (error.code === 'auth/user-not-found') {
+                        setErrorMessage('User not found! Please register to get started!');
+                    }
+                    console.error(error);
+                });
+                console.log('create acc success '+ response);
+                
+        
+    } catch (error) {
+        console.log('Error at our backend server aAuth; '+error)
+      }
+}
+
+    const loginSQL = async () => {
+        const tokenId = await auth().currentUser.getIdToken();
+        console.log('the token id is' + tokenId)               
+        const createdUser = await createUser(tokenId, email, username);
+        console.log('sql user ' + JSON.stringify(createdUser) );
+       
+        if(createdUser){
+            try{
+                setLoading(false)
+                 login(createdUser)
+          router.push({
+            pathname: `/OnboardScreenLayout`
+          });
+            } catch(error) {
+                console.log('Error at our backend server aAuth; '+error)
+            }
+        }     
+                     
+    }
+
+const createUser = async (firebaseUID, email, username) => {
+
+    const updatedUserData = {
+      "username": username,
+      "maxQuestions": 5,
+      "email": email,
+      "subscriptionStatus": "none"
+    } 
+
+
+    console.log(updatedUserData)
+
+    try {
+        const response = await fetch(API_URL + "firebase/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${firebaseUID}`, // Send token in Authorization header
+          },
+          body: JSON.stringify(updatedUserData)
+        });
+            if (response.ok) {
+          const data = await response.json();
+          console.log("user registered from backend:", data);
+          return data;
+        } else {
+          const errorMessage = await response.text();
+          console.error("Error from backend:", errorMessage);
+        }
+      } catch (error) {
+        console.error("Error sending token to backend:", error);
+      }
+  };
 
     return (
         <KeyboardAvoidingView
@@ -65,6 +152,9 @@ const register = () => {
                                     secureTextEntry={true}
                                     onChangeText={(text) => setPassword(text)}
                                 />
+                                <Text style={{fontSize: RFPercentage(1), fontFamily:'cLight', color:'red'}} >
+                                    {errorMessage}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -84,7 +174,7 @@ const register = () => {
 
                             <TouchableOpacity 
                                 style={styles.registerButton}
-                                // onPress={signUp}
+                                onPress={signUp}
                                 >
                                 <Text style={styles.registerButtonText}>
                                     Register

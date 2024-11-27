@@ -5,7 +5,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 import JPPopUp from '../../components/JPPopUp';
 import QPopUp from '../../components/QPopUp';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-//import { useGlobalContext } from '../context/GlobalProvider';
+import { useGlobalContext } from '../context/GlobalProvider';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,7 +15,7 @@ const userEntry = () => {
  // const route = useRoute();
   const params = useLocalSearchParams();
   const router = useRouter();
-  //const { getEntry, updateEntry, getEntryById } = useGlobalContext();
+  const { getEntry, updateEntry } = useGlobalContext();
   const [entry, setEntry] = useState(null);
 
   const [title, setTitle] = useState('');
@@ -27,70 +27,70 @@ const userEntry = () => {
   const [showQPopUp, setShowQPopUp] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
 
-//   useEffect(() => {
-//     console.log('Params received at entryid]:', params);
-//     console.log('ID from params at entryId]:', params.entryid);
+  useEffect(() => {
+    console.log('Params received at entryid]:', params);
+    console.log('ID from params at entryId]:', params.entryid);
 
 //     // if (params.entryid) {
 //     //   const fetchedEntry = getEntry(params.entryid);
 
-//     const loadEntry = async () => {
-//       try {
-//         const fetchedEntry = await getEntry(params.entryid);
+    const loadEntry = async () => {
+      try {
+        const fetchedEntry = await getEntry(params.entryid);
 
-//         if (fetchedEntry) {
-//           setEntry(fetchedEntry);
-//           setTitle(fetchedEntry.title);
-//           setContent(fetchedEntry.content);
-//           setShowJPPopUpText(fetchedEntry.answers[0]);
-//           setShowQPopUpText(fetchedEntry.questions);
+        if (fetchedEntry) {
+          setEntry(fetchedEntry);
+          setTitle(fetchedEntry.title);
+          setContent(fetchedEntry.content);
+          setShowJPPopUpText(fetchedEntry.answers[0]);
+          setShowQPopUpText(fetchedEntry.questions);
 
-//           const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
-//           if (localEntry) {
-//             const parsedLocalEntry = JSON.parse(localEntry);
-//             setTitle(parsedLocalEntry.title);
-//             setContent(parsedLocalEntry.content);
-//             setHasLocalChanges(true);
-//           }
-//          }
-//       } catch (error) {
-//         console.error('Error fetching entry:', error);
-//       }
-//     };
+          const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
+          if (localEntry) {
+            const parsedLocalEntry = JSON.parse(localEntry);
+            setTitle(parsedLocalEntry.title);
+            setContent(parsedLocalEntry.content);
+            setHasLocalChanges(true);
+          }
+         }
+      } catch (error) {
+        console.error('Error fetching entry:', error);
+      }
+    };
 
-//     loadEntry();
-//   }, [params.entryid]);
+    loadEntry();
+  }, [params.entryid]);
 
-// useEffect(() => {
-//   const updateInterval = setInterval(() => {
-//     if (hasLocalChanges) {
-//       handleApiUpdate();
-//     }
-//   }, 3000); // 30 seconds
+useEffect(() => {
+  const updateInterval = setInterval(() => {
+    if (hasLocalChanges) {
+      handleApiUpdate();
+    }
+  }, 3000); // 30 seconds
 
-//   return () => clearInterval(updateInterval);
-// }, [hasLocalChanges, title, content]);
+  return () => clearInterval(updateInterval);
+}, [hasLocalChanges, title, content]);
 
-// const saveLocally = async () => {
-//   try {
-//     const localEntry = { title, content };
-//     await AsyncStorage.setItem(`entry_${params.entryid}`, JSON.stringify(localEntry));
-//   } catch (error) {
-//     console.error('Error saving locally:', error);
-//   }
-// };
+const saveLocally = async () => {
+  try {
+    const localEntry = { title, content };
+    await AsyncStorage.setItem(`entry_${params.entryid}`, JSON.stringify(localEntry));
+  } catch (error) {
+    console.error('Error saving locally:', error);
+  }
+};
 
-// const handleApiUpdate = async () => {
-//   try {
-//     const updatedEntry = { ...entry, title, content };
-//     await updateEntry(updatedEntry);
-//     setHasLocalChanges(false);
-//     // Optionally, update the entry state here if needed
-//     setEntry(updatedEntry);
-//   } catch (error) {
-//     console.error('Error updating entry:', error);
-//   }
-// };
+const handleApiUpdate = async () => {
+  try {
+    const updatedEntry = { ...entry, title, content };
+    await updateEntry(updatedEntry);
+    setHasLocalChanges(false);
+    // Optionally, update the entry state here if needed
+    setEntry(updatedEntry);
+  } catch (error) {
+    console.error('Error updating entry:', error);
+  }
+};
 
 //     const DismissKeyboard = ({ children }) => (
 //     <TouchableWithoutFeedback onPress={()=>Keyboard.dismiss()}>
@@ -122,8 +122,7 @@ const userEntry = () => {
                     <TextInput
                     numberOfLines={1}
                     ellipsizeMode="tail"
-                    style={{fontSize: RFPercentage(3)}} 
-                    className="font-bSemi"
+                    style={{fontSize: RFPercentage(3), fontFamily: 'bSemi'}} 
                     value={title} 
                     //defaultValue="Enter title" 
                     placeholder="Enter title"

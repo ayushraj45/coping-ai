@@ -1,5 +1,5 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import EmotionMatrix from '../../components/EmotionMatrix'
 import MorningButton from '../../assets/icons/MorningButton'
@@ -7,11 +7,16 @@ import NightButton from '../../assets/icons/Nightbutton'
 import VentButton from '../../assets/icons/VentButton'
 import AddNew from '../../assets/icons/AddNew.svg'
 import InstaPromptList from '../../components/InstaPromptList'
+import { useGlobalContext } from '../context/GlobalProvider'
+import { router } from 'expo-router'
+import SubscribePrompt from '../../components/SubscribePrompt'
+import RotatingLogoLoader from '../../components/RotatingLogoLoader'
 
 const homepage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [triggerHandle, setTriggerHandle] = useState(false);
   const [selectedButton, setSelectedButton] = useState(null); 
+  const [isLoading, setIsloading] = useState(false)
   const [customFeeling, setCustomFeeling] = useState('');
   const [userId, setUserId] = useState(null);
   const [userFreeEntry, setUserFreeEntry]= useState(0);
@@ -19,6 +24,20 @@ const homepage = () => {
 
   //const { addEntry, getGPTResponse, getGPTInstaPrompt, user, isSubscribed , canMakeEntry} = useGlobalContext();
 
+  const {addEntry, getGPTResponse, getGPTInstaPrompt, user} = useGlobalContext();
+
+  useEffect(() => {
+    if (selectedItem && triggerHandle) {
+      handleNewEntry();
+      setTriggerHandle(false);  // Reset the trigger
+    }
+  }, [selectedItem, triggerHandle]);
+
+  useEffect(() => {
+    if(user){
+      setUserId(user.id); 
+    }
+  }, [user]);
 
   const isSelected = (buttonType) => 
     selectedButton === buttonType || 
@@ -65,14 +84,16 @@ const homepage = () => {
   };
 
   const handleNewEntry = async () => {
-    //setIsloading(true);
+    console.log(selectedItem);
+    setIsloading(true);
     setCustomFeeling('');
-    const allowEntry = await canMakeEntry();
-    if(allowEntry === false){
+    const allowEntry = true;
+    console.log(allowEntry)
+    if(!allowEntry){
       setShowSubscribeNotice(true);
       setSelectedButton(null);
       setSelectedItem(null);
-      //setIsloading(false);
+      setIsloading(false);
     }
     else {
     setIsloading(true);
@@ -127,14 +148,17 @@ const homepage = () => {
         }
       } 
     
-    } else {
-      console.log('failed to create new entry to begin with, so we never got new ID')
-    }
+    // } else {
+    //   console.log('failed to create new entry to begin with, so we never got new ID')
+    // }
   }
   }
+}
 
   return (
     <SafeAreaView style={styles.main}>
+            <SubscribePrompt visible={showSubsribeNotice} onClose={() => {setShowSubscribeNotice(false)}} text={"You have reached your weekly limit of free entries. Please subscribe to enjoy unlimited entries and more!"}/>
+            <RotatingLogoLoader isLoading={isLoading}/>
       <View style={styles.upperSpace} />
       <View style={styles.topText}>
           <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Hello@User</Text>

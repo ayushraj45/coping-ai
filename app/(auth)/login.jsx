@@ -1,16 +1,93 @@
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import AuthBG1 from '../../assets/icons/AuthBG1.svg'
-
+import auth from '@react-native-firebase/auth';
 import React, { useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
+import { useGlobalContext } from '../context/GlobalProvider';
 
 const login = () => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)  
+    const [errorMessage, setErrorMessage] = useState(null)
+    const {login, API_URL} = useGlobalContext();
+
+    const signIn = async () => {
+        const response = auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+            console.log('User account signed in! ');
+            loginSQL();
+        })
+        .catch(error => {
+            if (error.code === 'auth/wrong-password') {
+                setErrorMessage('Password is incorrect, please try again!');
+            }
+            if (error.code === 'auth/invalid-email') {
+                setErrorMessage('That email address is invalid!');
+            }
+            if (error.code === 'auth/user-not-found') {
+                setErrorMessage('User not found! Please register to get started!');
+            }
+            console.error(error);
+        });
+        console.log('create acc success '+ response);
+    }
+
+        const loginSQL = async () => {
+                const tokenId = await auth().currentUser.getIdToken();
+                console.log('the token id is ' + tokenId)      
+                const loggedUser = await fetchAndSetUser(tokenId);
+                console.log('sql user ' + JSON.stringify(loggedUser) );
+                if(loggedUser){
+                    try{
+                        setLoading(false)
+                        login(loggedUser)
+                router.replace({
+                    pathname: `/homepage`
+                });
+                } catch(error) {
+                    console.log('Error at our backend server aAuth; '+error)
+                }
+            }    
+        }
+        
+        const fetchAndSetUser = async (providerID) => {
+            console.log('fetching of user happened with provider id: ' + providerID);
+            try {
+              const data = await getUserByProvider(providerID);
+              console.log('user data without string', data);
+              console.log('user data here at fetch and set user:', JSON.stringify(data));
+              return data;
+            } catch (error) {
+              console.log(error);
+              throw error; // Re-throw the error so it can be caught by the caller if needed
+            }
+          };
+
+          const getUserByProvider = async (providerID) => {
+            try {
+                const response = await fetch(API_URL + "firebase/login", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${providerID}`, // Send token in Authorization header
+                  }
+                });
+                    if (response.ok) {
+                  const data = await response.json();
+                  console.log("user registered from backend:", data);
+                  return data;
+                } else {
+                  const errorMessage = await response.text();
+                  console.error("Error from backend:", errorMessage);
+                }
+              } catch (error) {
+                console.error("Error sending token to backend:", error);
+              }
+       }
 
     const { width , height } = Dimensions.get('window');
 
@@ -54,6 +131,9 @@ const login = () => {
                                     onChangeText={(text) => setPassword(text)}
                                 />
                             </View>
+                            <Text style={{fontSize: RFPercentage(1), fontFamily:'cLight', color:'red'}} >
+                                    {errorMessage}
+                            </Text>
                             <TouchableOpacity onPress={() => router.push("/forgetPassword")}>
                                 <Text style={[ {fontSize: RFPercentage(2), fontWeight: 'bold', paddingVertical:20, fontFamily:'cLight'}]} >
                                     Forgot password?
@@ -78,7 +158,7 @@ const login = () => {
 
                             <TouchableOpacity 
                                 style={styles.registerButton}
-                                // onPress={signUp}
+                                 onPress={signIn}
                                 >
                                 <Text style={styles.registerButtonText}>
                                     Login
