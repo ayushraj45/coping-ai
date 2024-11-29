@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "886343704923-0f5q6krau3143d0j9og1g6tl10nqnhg9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ayushrajp.copingai",
+            "certificate_hash": "b9ace474e4d80d6f030f90e82504f920680685d7"
+          }
+        },
+        {
           "client_id": "886343704923-dbo40mq73v8crvtn40ho1fev1e1se7a8.apps.googleusercontent.com",
           "client_type": 3
         }

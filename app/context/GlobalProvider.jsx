@@ -1,8 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
-
-
+import * as Notifications from "expo-notifications";
+//import { Subscription } from "expo-modules-core";
+import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotificationsAsync";
+import RegisterForPushNotifications from "@/utils/registerForPushNotificationsAsync";
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
 
@@ -15,6 +17,13 @@ const [user, setUser] = useState(null);
 const [isSubscribed, setIsSubscribed] = useState(false);
 const [ isLoggedIn, setIsLoggedIn] = useState(false);
 const [initializing, setInitializing] = useState(true);
+const [expoPushToken, setExpoPushToken] = useState('');
+const [notification, setNotification] = useState(null);
+const [error, setError] = useState(null);
+
+const notificationListener = useRef();
+const responseListener = useRef();
+
 
 useEffect(() => {
     const subscriber = auth().onAuthStateChanged(async (authUser) => {
@@ -40,6 +49,39 @@ useEffect(() => {
     return subscriber;
   }, [initializing]);
 
+
+useEffect(() => {
+  registerForPushNotificationsAsync().then(
+    (token) => setExpoPushToken(token)
+  );
+
+  notificationListener.current = 
+    Notifications.addNotificationReceivedListener((notification) => {
+      console.log("🔔 Notification Received: ", notification);
+      setNotification(notification);     
+    })
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(
+          "🔔 Notification Response: ",
+          JSON.stringify(response, null, 2),
+          JSON.stringify(response.notification.request.content.data, null, 2)
+        );
+        // Handle the notification response here
+      });
+
+      return () => {
+        if (notificationListener.current) {
+          Notifications.removeNotificationSubscription(
+            notificationListener.current
+          );
+        }
+        if (responseListener.current) {
+          Notifications.removeNotificationSubscription(responseListener.current);
+        }
+      };
+    }, []);
 
   const getUserByProvider = async (providerID) => {
     try {
@@ -315,7 +357,7 @@ const updateUser = async (updatedUser) =>{
 
 
     return(
-        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, addEntry, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, updateUser, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, updateUser, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

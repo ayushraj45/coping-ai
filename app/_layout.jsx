@@ -2,7 +2,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import GlobalProvider from "./context/GlobalProvider"
-
+import * as Notifications from "expo-notifications";
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
@@ -30,6 +30,14 @@ const RootLayout = () => {
   if (!fontsLoaded && !error) {
     return null;
   }
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
   return (
     <GlobalProvider>
