@@ -1,10 +1,10 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useState } from 'react'
-//import { useGlobalContext } from '../app/context/GlobalProvider'
+import { useGlobalContext } from '../app/context/GlobalProvider'
 
 const FeedbackPrompt = ({ visible, onClose }) => {
 
-    //const { addFeedback } = useGlobalContext();
+    const { addFeedback } = useGlobalContext();
     const [category, setCategory] = useState('');
     const [content, setContent] = useState('');
     const [feedbackSent, setFeedbackSent] = useState(false)

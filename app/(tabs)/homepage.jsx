@@ -18,6 +18,8 @@ const homepage = () => {
   const [selectedButton, setSelectedButton] = useState(null); 
   const [isLoading, setIsloading] = useState(false)
   const [customFeeling, setCustomFeeling] = useState('');
+  const [userName, setUserName] = useState('User');
+
   const [userId, setUserId] = useState(null);
   const [userFreeEntry, setUserFreeEntry]= useState(0);
   const [showSubsribeNotice, setShowSubscribeNotice ] = useState(false)
@@ -25,6 +27,10 @@ const homepage = () => {
   //const { addEntry, getGPTResponse, getGPTInstaPrompt, user, isSubscribed , canMakeEntry} = useGlobalContext();
 
   const {addEntry, getGPTResponse, getGPTInstaPrompt, user} = useGlobalContext();
+
+  useEffect(() => {
+    setCustomFeeling('');
+  })
 
   useEffect(() => {
     if (selectedItem && triggerHandle) {
@@ -36,6 +42,7 @@ const homepage = () => {
   useEffect(() => {
     if(user){
       setUserId(user.id); 
+      setUserName(user.username)
     }
   }, [user]);
 
@@ -161,7 +168,7 @@ const homepage = () => {
             <RotatingLogoLoader isLoading={isLoading}/>
       <View style={styles.upperSpace} />
       <View style={styles.topText}>
-          <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Hello@User</Text>
+          <Text style={{fontSize: RFPercentage(3), fontFamily:'cMedium'}}>Hello {userName} </Text>
         </View>
       <View style={{paddingVertical:5, marginTop:5, }}>
       <TextInput
@@ -169,8 +176,8 @@ const homepage = () => {
           marginVertical: RFPercentage(1),
           marginHorizontal: 12,
           backgroundColor: '#F1F1F1',
-          borderRadius: 20,
-          padding: 5,
+          borderRadius: 10,
+          padding: 10,
           fontSize: 20,
           paddingVertical: 10,
           opacity:0.4
@@ -181,8 +188,8 @@ const homepage = () => {
           backgroundColor: '#F1F1F1',
           borderColor:'#011C2D',
           borderWidth:1,
-          borderRadius: 20,
-          padding: 5,
+          borderRadius: 10,
+          padding: 10,
           fontSize: 20,
           paddingVertical: 10
       }]}
@@ -221,7 +228,7 @@ const homepage = () => {
       </View>
       <View>
       <TextInput  
-             style={[ {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,opacity:0.4}, !selectedItem && {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 20, padding:5, fontSize:20,borderColor:'#011C2D',borderWidth:1, } ]}
+             style={[ {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 10, padding:8, fontSize:20,opacity:0.4}, !selectedItem && {marginVertical:RFPercentage(1), marginHorizontal:12, backgroundColor:'#F1F1F1', borderRadius: 10, padding:8, fontSize:20,borderColor:'#011C2D',borderWidth:1, } ]}
              placeholder='I feel...'
              
              editable={!selectedItem}

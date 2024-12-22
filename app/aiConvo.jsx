@@ -16,7 +16,7 @@ const aiConvo = () => {
      const [text, setText] = useState('');
 //     //const params = useLocalSearchParams();
      const router = useRouter();
-     const {getGPTResponse, user} = useGlobalContext();
+     const {getGPTResponse, user, isLoading, refreshEntries} = useGlobalContext();
 //     // const maxQuestions = 3; //Set this from user! 
     const [qCount, setQCount] = useState(params.qCount)
      const textInputRef = useRef('');
@@ -39,6 +39,7 @@ const aiConvo = () => {
               animation: 'none'
             });
           } else {
+            await refreshEntries();
             router.replace({
               pathname: `/entry/[id]`,
               params: { id: entryID },
@@ -52,6 +53,7 @@ const aiConvo = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+          <RotatingLogoLoader isLoading={isLoading}/>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardAvoid}

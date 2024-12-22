@@ -49,38 +49,41 @@ useEffect(() => {
     return subscriber;
   }, [initializing]);
 
+  const getNotificationToken = () => {
+    registerForPushNotificationsAsync().then(
+      (token) => setExpoPushToken(token)
+    );
+  
+    notificationListener.current = 
+      Notifications.addNotificationReceivedListener((notification) => {
+        console.log("🔔 Notification Received: ", notification);
+        setNotification(notification);     
+      })
+  
+      responseListener.current =
+        Notifications.addNotificationResponseReceivedListener((response) => {
+          console.log(
+            "🔔 Notification Response: ",
+            JSON.stringify(response, null, 2),
+            JSON.stringify(response.notification.request.content.data, null, 2)
+          );
+          // Handle the notification response here
+        });
+  
+        return () => {
+          if (notificationListener.current) {
+            Notifications.removeNotificationSubscription(
+              notificationListener.current
+            );
+          }
+          if (responseListener.current) {
+            Notifications.removeNotificationSubscription(responseListener.current);
+          }
+        };
+  }
 
 useEffect(() => {
-  registerForPushNotificationsAsync().then(
-    (token) => setExpoPushToken(token)
-  );
-
-  notificationListener.current = 
-    Notifications.addNotificationReceivedListener((notification) => {
-      console.log("🔔 Notification Received: ", notification);
-      setNotification(notification);     
-    })
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(
-          "🔔 Notification Response: ",
-          JSON.stringify(response, null, 2),
-          JSON.stringify(response.notification.request.content.data, null, 2)
-        );
-        // Handle the notification response here
-      });
-
-      return () => {
-        if (notificationListener.current) {
-          Notifications.removeNotificationSubscription(
-            notificationListener.current
-          );
-        }
-        if (responseListener.current) {
-          Notifications.removeNotificationSubscription(responseListener.current);
-        }
-      };
+  getNotificationToken();
     }, []);
 
   const getUserByProvider = async (providerID) => {
@@ -114,6 +117,8 @@ const login = async (userData) => {
         console.log('user at GC login function ' + JSON.stringify(user))
         //console.log('user ID at GC  ' + user.id)  
         setIsLoggedIn(true);
+        getNotificationToken();
+        console.log(expoPushToken);
         fetchAllEntries(user)
       } catch (error) {
         console.error('Error saving login data', error);
@@ -129,9 +134,9 @@ const login = async (userData) => {
 
     const logout = async () => {
         try {
-          await auth().signOut();  
           await AsyncStorage.removeItem('user');
           await AsyncStorage.removeItem('isLoggedIn');
+          await auth().signOut();  
           setUser(null);
           setIsLoggedIn(false);
         } catch (error) {
@@ -296,7 +301,7 @@ const addEntry = async (entry) => {
 
 
   const getGPTResponse = (entryID, prompt) => {
-    //setIsLoading(true)
+    setIsLoading(true)
     console.log('this is the entry: ' + entryID + 'the prompt: ' + prompt)
     return fetch(API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
     .then(response => response.json())
@@ -355,9 +360,26 @@ const updateUser = async (updatedUser) =>{
         else {return false;}
       }
 
+    const addFeedback = async (feedback) => {
+      console.log(feedback)
+      try {
+            const response = await fetch(API_URL + 'feedbacks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(feedback),
+            });
+            const data = await response.json();
+            console.log(data);
+            if (data) {return true;}
+        } catch (error) {
+            return console.error('Error adding Feedback: ' + error);
+        }
+    };
 
     return(
-        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, updateUser, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

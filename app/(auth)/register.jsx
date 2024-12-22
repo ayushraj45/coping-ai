@@ -13,7 +13,7 @@ const register = () => {
     const [password, setPassword] = useState('')
     const [username, setUsername] = useState('')
     const [loading, setLoading] = useState(false)  
-    const {login, API_URL} = useGlobalContext();
+    const {login, API_URL, expoPushToken} = useGlobalContext();
     const [errorMessage, setErrorMessage] = useState(null)
 
     const { width , height } = Dimensions.get('window');
@@ -51,7 +51,7 @@ const register = () => {
     const loginSQL = async () => {
         const tokenId = await auth().currentUser.getIdToken();
         console.log('the token id is' + tokenId)               
-        const createdUser = await createUser(tokenId, email, username);
+        const createdUser = await createUser(tokenId, email, username, expoPushToken);
         console.log('sql user ' + JSON.stringify(createdUser) );
        
         if(createdUser){
@@ -68,12 +68,13 @@ const register = () => {
                      
     }
 
-const createUser = async (firebaseUID, email, username) => {
+const createUser = async (firebaseUID, email, username, expoPushToken) => {
 
     const updatedUserData = {
       "username": username,
       "maxQuestions": 5,
       "email": email,
+      "firebaseToken": expoPushToken,
       "subscriptionStatus": "none"
     } 
 

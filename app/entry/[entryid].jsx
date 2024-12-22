@@ -17,7 +17,7 @@ const userEntry = () => {
   const router = useRouter();
   const { getEntry, updateEntry } = useGlobalContext();
   const [entry, setEntry] = useState(null);
-
+const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [text, setText] = useState('');
@@ -27,39 +27,40 @@ const userEntry = () => {
   const [showQPopUp, setShowQPopUp] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
 
-  useEffect(() => {
+  useEffect(()  => {
     console.log('Params received at entryid]:', params);
     console.log('ID from params at entryId]:', params.entryid);
-
-//     // if (params.entryid) {
-//     //   const fetchedEntry = getEntry(params.entryid);
-
-    const loadEntry = async () => {
-      try {
-        const fetchedEntry = await getEntry(params.entryid);
-
-        if (fetchedEntry) {
-          setEntry(fetchedEntry);
-          setTitle(fetchedEntry.title);
-          setContent(fetchedEntry.content);
-          setShowJPPopUpText(fetchedEntry.answers[0]);
-          setShowQPopUpText(fetchedEntry.questions);
-
-          const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
-          if (localEntry) {
-            const parsedLocalEntry = JSON.parse(localEntry);
-            setTitle(parsedLocalEntry.title);
-            setContent(parsedLocalEntry.content);
-            setHasLocalChanges(true);
-          }
-         }
-      } catch (error) {
-        console.error('Error fetching entry:', error);
-      }
-    };
-
+    setIsLoading(true)
     loadEntry();
-  }, [params.entryid]);
+
+    if (entry) {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const loadEntry = async () => {
+    try {
+      const fetchedEntry = await getEntry(params.entryid);
+
+      if (fetchedEntry) {
+        setEntry(fetchedEntry);
+        setTitle(fetchedEntry.title);
+        setContent(fetchedEntry.content);
+        setShowJPPopUpText(fetchedEntry.answers[0]);
+        setShowQPopUpText(fetchedEntry.questions);
+
+        const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
+        if (localEntry) {
+          const parsedLocalEntry = JSON.parse(localEntry);
+          setTitle(parsedLocalEntry.title);
+          setContent(parsedLocalEntry.content);
+          setHasLocalChanges(true);
+        }
+       }
+    } catch (error) {
+      console.error('Error fetching entry:', error);
+    }
+  }
 
 useEffect(() => {
   const updateInterval = setInterval(() => {

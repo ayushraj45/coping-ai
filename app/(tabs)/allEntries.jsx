@@ -1,11 +1,11 @@
-import { Text, FlatList, RefreshControl } from 'react-native'
+import { Text, FlatList, RefreshControl, Dimensions } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import JournalEntryPane from '../../components/JournalEntryPane'
 import SearchBarComponent from '../../components/Searchbar'
 import { useGlobalContext } from '../context/GlobalProvider'
 import { useFocusEffect, useRouter } from 'expo-router'
-import { useWindowDimensions } from 'react-native'
+
 
 
 const allEntries = () => {
@@ -13,6 +13,9 @@ const allEntries = () => {
   const [searchText, setSearchText] = useState('');
   const [filteredEntries, setFilteredEntries] = useState(entries);
   const [refreshing, setRefreshing] = useState(false);
+
+const { width, height } = Dimensions.get('window');
+
 
   const fetchEntries = async (user) => {
     setRefreshing(true);
@@ -50,7 +53,7 @@ const allEntries = () => {
 
   return (
       <SafeAreaView style={{
-        widht: 430, height: 850,
+        widht: width, height: height,
         backgroundColor:"#FEF8EC",
     }}>
         <SearchBarComponent

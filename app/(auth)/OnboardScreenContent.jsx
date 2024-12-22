@@ -2,24 +2,28 @@ import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import ProfileLogo from '../../assets/icons/ProfileLogo';
-import OBScreen2 from '../../assets/icons/OBScreen2';
-import OBScreen3 from '../../assets/icons/OBScreen3';
-import OBScreen4 from '../../assets/icons/OBScreen4';
+import OBScreen2 from '../../assets/icons/OBScreen2.svg';
+import OBScreen3 from '../../assets/icons/OBScreen3.svg';
+import OBScreen4 from '../../assets/icons/OBScreen4.svg';
 
 
 
 const OnboardScreenContent = ({number,  title, content }) => {
+
+
+  const { width , height } = Dimensions.get('window');
+
 
     const handleSVGImage = (num) => {
         switch(num) {
             case 1:
                 return <ProfileLogo />;
             case 2:
-                return <OBScreen2/>
+                return <OBScreen2 width={width * 0.68} height={height*0.28}/>
             case 3:
-                return <OBScreen3/>
+                return <OBScreen3 width={width * 0.68} height={height*0.28}/>
             case 4:
-                return <OBScreen4/>            
+                return <OBScreen4 width={width * 0.68} height={height*0.28}/>            
             default:
                 return null; // Always good to have a default case
         }
