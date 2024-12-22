@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Purchases, { PurchasesOffering } from 'react-native-purchases';
+
 
 const PricingOption = ({ title, description, isSelected, onSelect, isBestValue }) => (
     <TouchableOpacity 
@@ -14,6 +16,78 @@ const PricingOption = ({ title, description, isSelected, onSelect, isBestValue }
 
 const PricingPanel = () => {
   const [selectedPlan, setSelectedPlan] = useState('annual');
+
+  const fetchProducts = async () => {
+    try {
+      const offerings = await Purchases.getOfferings();
+      if (offerings?.current?.availablePackages) {
+        console.log(offerings.current.availablePackages);
+        return offerings.current.availablePackages;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
+  };
+
+  const handlePurchase = async (selectedPlan) => {
+    try {
+      const { customerInfo } = await Purchases.purchasePackage(selectedPlan);
+      
+      // Check if user has access to your entitlement
+      const entitlementId = 'YOUR_ENTITLEMENT_ID';
+      if (customerInfo.entitlements.active[entitlementId]) {
+        // User has access to entitlement
+        return {
+          success: true,
+          subscriptionActive: true,
+          expirationDate: customerInfo.entitlements.active[entitlementId].expirationDate,
+          originalPurchaseDate: customerInfo.entitlements.active[entitlementId].originalPurchaseDate
+        };
+      }
+      return {
+        success: true,
+        subscriptionActive: false
+      };
+    } catch (error) {
+      if (!error.userCancelled) {
+        Alert.alert('Error', 'Purchase failed: ' + error.message);
+      }
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
+  
+  const onPurchasePress = async () => {
+    const result = await handlePurchase(selectedPlan);
+    
+    if (result.success && result.subscriptionActive) {
+      // Update your backend/database here
+      // Example API call:
+      try {
+        await fetch('YOUR_API_ENDPOINT', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: 'CURRENT_USER_ID',
+            subscriptionStatus: 'active',
+            expirationDate: result.expirationDate,
+            originalPurchaseDate: result.originalPurchaseDate
+          })
+        });
+      } catch (error) {
+        console.error('Error updating backend:', error);
+      }
+      
+      // Navigate to premium content or update UI
+      Alert.alert('Success', 'Thank you for subscribing!');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -30,8 +104,8 @@ const PricingPanel = () => {
         isSelected={selectedPlan === 'monthly'}
         onSelect={() => setSelectedPlan('monthly')}
       />
-      <TouchableOpacity style={styles.trialButton}>
-        <Text style={styles.trialButtonText}>Start 30-day free trial</Text>
+      <TouchableOpacity style={styles.trialButton} onPress={onPurchasePress}>
+        <Text style={styles.trialButtonText}>Get Coping Pro</Text>
       </TouchableOpacity>
       <Text style={styles.termsText}>
         By placing this order, you agree to the Terms of Service and Privacy Policy. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.

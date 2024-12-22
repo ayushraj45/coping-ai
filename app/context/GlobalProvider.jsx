@@ -7,6 +7,8 @@ import { registerForPushNotificationsAsync } from "@/utils/registerForPushNotifi
 import RegisterForPushNotifications from "@/utils/registerForPushNotificationsAsync";
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
+import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases';
+import { Platform } from "react-native";
 
 const GlobalProvider = ({ children }) => {
 const API_URL = 'http://192.168.1.204:8080/';
@@ -108,12 +110,31 @@ useEffect(() => {
       }
 }
 
+//Init Revenue Cat
+useEffect(() => {
+  const setup = async () => {
+    try{
+    if (Platform.OS == "android") {      
+      await Purchases.configure({ apiKey: 'googleAPIhere' });
+    } else {
+      await Purchases.configure({ apiKey: 'appl_bKjBvIBLemkBPibcJuXbCyMAzvi' });
+    }
+    Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+  }
+  catch (error) {
+    console.error('Error initializing RevenueCat:', error);
+}}
+    setup();
+},[])
+
+
 const login = async (userData) => {
     setIsLoading(true)
       try {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('isLoggedIn', 'true');
         setUser(userData);
+        await Purchases.logIn(userData.id);
         console.log('user at GC login function ' + JSON.stringify(user))
         //console.log('user ID at GC  ' + user.id)  
         setIsLoggedIn(true);
