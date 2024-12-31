@@ -17,10 +17,10 @@ const allEntries = () => {
 const { width, height } = Dimensions.get('window');
 
 
-  const fetchEntries = async (user) => {
+  const fetchEntries = async () => {
     setRefreshing(true);
     try {
-      await fetchAllEntries(user);
+      await fetchAllEntries();
       console.log('refresh happen')
       setRefreshing(false);
     } catch (error) {

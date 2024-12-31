@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileLogo from '../../assets/icons/ProfileLogo';
 import { Ionicons } from '@expo/vector-icons';
 import { RFPercentage } from 'react-native-responsive-fontsize';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useGlobalContext } from '../context/GlobalProvider';
 
 const profile = () => {
@@ -18,7 +18,7 @@ const profile = () => {
   const [value, setValue] = useState(2);
   const [tempValue, setTempValue] = useState(2);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
-  const { user , isLoggedIn, updateUser, entriesLength, refreshUserData} = useGlobalContext();
+  const { user , isLoggedIn, updateUser, entriesLength, refreshUserData,getUserById, logout} = useGlobalContext();
   const [isLoading, setIsLoading] =useState(false)
   const [currentEntryLength, setCurrentEntryLength] = useState(`${value}`);
 
@@ -55,7 +55,7 @@ const handleSave = async () => {
 }
 
 const setUpProfile = async () => {
-  const thisUser = await refreshUserData();
+  const thisUser = await getUserById(user.id);
   console.log('user at useEffect: ' + thisUser)
     setValue(thisUser.maxQuestions); 
     setTempValue(thisUser.maxQuestions); 
@@ -112,7 +112,7 @@ return (
         <ProfileLogo />
       </View>
       <View style={styles.usernameText}>
-        <Text style={{fontSize: RFPercentage(2), fontFamily: 'bSemi'}} className="font-bSemi" >  Coping</Text>
+        <Text style={{fontSize: RFPercentage(2), fontFamily: 'bSemi'}} className="font-bSemi" >  If you need to talk, we're here!</Text>
       </View>
       <View style={styles.stroke} />
       
@@ -165,9 +165,12 @@ return (
 
       </View>
       <View style={styles.infoRow}>
-        <TouchableOpacity>
-          <Text style={{fontSize: RFPercentage(2.5)}} className="font-bSemi"> Logout</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => { logout();  router.replace("/login")}}>
+            <View style={styles.pageButton}>
+            <Ionicons name="log-out-outline" size={30} color="black" />
+            <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>Logout</Text>
+            </View>
+            </TouchableOpacity>         
       </View>
     </SafeAreaView>  
 
@@ -192,6 +195,11 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: "black",
   },
+  pageButton: {
+flexDirection:'row',
+alignItems:'center',
+padding:5,
+},
   infoRow:{
     flexDirection:'row',
     alignItems:'baseline',

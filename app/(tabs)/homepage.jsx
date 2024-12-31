@@ -26,7 +26,7 @@ const homepage = () => {
 
   //const { addEntry, getGPTResponse, getGPTInstaPrompt, user, isSubscribed , canMakeEntry} = useGlobalContext();
 
-  const {addEntry, getGPTResponse, getGPTInstaPrompt, user} = useGlobalContext();
+  const {addEntry, getGPTResponse, getGPTInstaPrompt, user, canMakeEntry} = useGlobalContext();
 
   useEffect(() => {
     setCustomFeeling('');
@@ -94,8 +94,8 @@ const homepage = () => {
     console.log(selectedItem);
     setIsloading(true);
     setCustomFeeling('');
-    const allowEntry = true;
-    console.log(allowEntry)
+    const allowEntry = await canMakeEntry();
+    console.log('allow entry is true or not: ', allowEntry)
     if(!allowEntry){
       setShowSubscribeNotice(true);
       setSelectedButton(null);

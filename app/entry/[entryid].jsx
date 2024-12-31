@@ -15,14 +15,14 @@ const userEntry = () => {
  // const route = useRoute();
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { getEntry, updateEntry } = useGlobalContext();
+  const { getEntry, updateEntry , getEntryById } = useGlobalContext();
   const [entry, setEntry] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [text, setText] = useState('');
   const [showJPPopUp, setShowJPPopUp] = useState(true);
-  const [showJPPopUpText, setShowJPPopUpText] = useState('hi man this q ');
+  const [showJPPopUpText, setShowJPPopUpText] = useState(null);
   const [showQPopUpText, setShowQPopUpText] = useState([]);
   const [showQPopUp, setShowQPopUp] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
@@ -34,14 +34,16 @@ const [isLoading, setIsLoading] = useState(false);
     loadEntry();
 
     if (entry) {
-      setIsLoading(false);
+      
+        setIsLoading(false);
+      
     }
   }, []);
 
   const loadEntry = async () => {
     try {
-      const fetchedEntry = await getEntry(params.entryid);
-
+      const fetchedEntry = await getEntryById(params.entryid);
+      console.log('fetched entry after making it: ', fetchedEntry)
       if (fetchedEntry) {
         setEntry(fetchedEntry);
         setTitle(fetchedEntry.title);

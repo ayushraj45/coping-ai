@@ -1,33 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Purchases, { PurchasesOffering } from 'react-native-purchases';
+import { useGlobalContext } from '../app/context/GlobalProvider';
 
 
-const PricingOption = ({ title, description, isSelected, onSelect, isBestValue }) => (
+const PricingOption = ({ identifier, title, description, isSelected, onSelect, isBestValue,perweek, price, packageType }) => (
     <TouchableOpacity 
       style={[styles.pricingOption, isSelected && styles.selectedOption]}
       onPress={onSelect}
     >
-      <Text style={styles.optionTitle}>{title}</Text>
+      <Text style={styles.optionTitle}>{price} </Text> 
+      <Text style={styles.perweek}>{perweek} / Per Week </Text>
+      <Text style={styles.optionDescription}>{title}</Text>
       <Text style={styles.optionDescription}>{description}</Text>
+
       {isBestValue && <Text style={styles.bestValue}>Best Value</Text>}
     </TouchableOpacity>
   );
 
 const PricingPanel = () => {
-  const [selectedPlan, setSelectedPlan] = useState('annual');
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [products, setProducts] = useState([]);
+  const { updateUserSubscriptionStatus } = useGlobalContext();
+
+  useEffect(() => {
+      const productSetup = async ()=> {
+       await fetchProducts();
+        console.log('products: ' + JSON.stringify(products))
+      }
+
+      productSetup();
+     
+    },[]);
 
   const fetchProducts = async () => {
     try {
       const offerings = await Purchases.getOfferings();
-      if (offerings?.current?.availablePackages) {
-        console.log(offerings.current.availablePackages);
-        return offerings.current.availablePackages;
+      const currentOffering = offerings.current;
+      if(currentOffering) {
+        setProducts(currentOffering.availablePackages)
+        console.log('current offering log ' + products) 
       }
-      return [];
+      return 'the offerings are empty';
     } catch (error) {
       console.error('Error fetching products:', error);
-      return [];
     }
   };
 
@@ -36,7 +52,7 @@ const PricingPanel = () => {
       const { customerInfo } = await Purchases.purchasePackage(selectedPlan);
       
       // Check if user has access to your entitlement
-      const entitlementId = 'YOUR_ENTITLEMENT_ID';
+      const entitlementId = 'pro';
       if (customerInfo.entitlements.active[entitlementId]) {
         // User has access to entitlement
         return {
@@ -61,51 +77,73 @@ const PricingPanel = () => {
     }
   };
   
-  const onPurchasePress = async () => {
-    const result = await handlePurchase(selectedPlan);
+  const onPurchasePress = async (selectedPlan) => {
+    console.log('on purchase press: ' + (selectedPlan));
+    await Purchases.purchasePackage(selectedPlan);
+    // const result = await handlePurchase(selectedPlan);
     
-    if (result.success && result.subscriptionActive) {
-      // Update your backend/database here
-      // Example API call:
-      try {
-        await fetch('YOUR_API_ENDPOINT', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: 'CURRENT_USER_ID',
-            subscriptionStatus: 'active',
-            expirationDate: result.expirationDate,
-            originalPurchaseDate: result.originalPurchaseDate
-          })
-        });
-      } catch (error) {
-        console.error('Error updating backend:', error);
-      }
+    // if (result.success && result.subscriptionActive) {
+    //   // Update your backend/database here
+    //   // Example API call:
+    //   try {
+    //     await fetch('YOUR_API_ENDPOINT', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         userId: 'CURRENT_USER_ID',
+    //         subscriptionStatus: 'active',
+    //         expirationDate: result.expirationDate,
+    //         originalPurchaseDate: result.originalPurchaseDate
+    //       })
+    //     });
+    //   } catch (error) {
+    //     console.error('Error updating backend:', error);
+    //   }
       
-      // Navigate to premium content or update UI
-      Alert.alert('Success', 'Thank you for subscribing!');
-    }
+    //   // Navigate to premium content or update UI
+    //   Alert.alert('Success', 'Thank you for subscribing!');
+    //}
   };
+
+  const onPurchase = async (pack) => {
+		// Purchase the package
+    try{
+      await Purchases.purchasePackage(pack);
+
+      if(pack.product.identifier === 'pro_month'){
+        console.log('monthly log works; ', pack.product.identifier)
+        updateUserSubscriptionStatus('Pro Monthly')
+      }
+      else if(pack.product.identifier === 'pro_annual'){
+        updateUserSubscriptionStatus('Pro Annual')
+      }else{}
+    }catch (e){
+        console.log(e)
+    }
+	};
 
   return (
     <View style={styles.container}>
-      <PricingOption
-        title="Annual"
-        description="First 30 days free - Then $999/Year"
-        isSelected={selectedPlan === 'annual'}
-        onSelect={() => setSelectedPlan('annual')}
-        isBestValue={true} 
-      />
-      <PricingOption
-        title="Monthly"
-        description="First 7 days free - Then $99/Month"
-        isSelected={selectedPlan === 'monthly'}
-        onSelect={() => setSelectedPlan('monthly')}
-      />
+
+      <Text style={{fontFamily:'bSemi', fontSize:15, color:'red'}}> INTRODUCTORY OFFER: ALL PRICES ARE 50% OFF!</Text>
+
+				{products.map((pack) => (
+          <PricingOption
+          key={pack.identifier}
+         // onPress={() => onPurchase(pack)}
+          title={pack.product.title}
+          description={pack.product.description}
+          price={pack.product.priceString}
+          perweek={pack.product.pricePerWeekString}
+          isSelected={selectedPlan?.identifier === '$rc_annual'}
+          onSelect={() => { onPurchase(pack) }}        
+          />
+				))}
+		
       <TouchableOpacity style={styles.trialButton} onPress={onPurchasePress}>
-        <Text style={styles.trialButtonText}>Get Coping Pro</Text>
+        <Text style={styles.trialButtonText}>Remove All Limits</Text>
       </TouchableOpacity>
       <Text style={styles.termsText}>
         By placing this order, you agree to the Terms of Service and Privacy Policy. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.

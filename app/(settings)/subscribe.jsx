@@ -1,10 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import GradiBackground from '../../components/GradiBackground'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import IndexLogo from '../../assets/icons/IndexLogo'
 import PricingPanel from '../../components/PricingPanel'
-
+import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases';
 
 
 
@@ -51,4 +51,3 @@ const styles = StyleSheet.create({
   }
 
 })
-

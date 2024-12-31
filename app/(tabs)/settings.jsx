@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions, Touchable, TouchableOpacity, Button, Share } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, Touchable, TouchableOpacity, Button, Share, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -41,12 +41,14 @@ const settings = () => {
 
   const ProfileButton = ({icon, text, link, pressFunction}) => {
     return (
+      <View style={styles.profileButtonContainer}> 
       <TouchableOpacity onPress={() => { (pressFunction) ? pressFunction() : router.push(link)}}>
             <View style={styles.pageButton}>
             <Ionicons name={icon} size={30} color="black" />
             <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>  {text}</Text>
             </View>
             </TouchableOpacity>
+            </View>
     )
   }
 
@@ -62,16 +64,26 @@ const settings = () => {
 
   return (
     <SafeAreaView style={styles.main}>
+      <ScrollView>
       <FeedbackPrompt visible={showFeedback} onClose={() => {setShowFeedback(false)}}/>
             <View style={styles.topText}>
               <Text style={{fontSize: RFPercentage(4), fontFamily: 'bSemi'}}>Settings </Text>
             </View>
-            <View style={styles.stroke}>
+            {/* <View style={styles.stroke}>
+            </View> */}
+
+            <View style={styles.limitButtonContainer}> 
+              <TouchableOpacity onPress={() => { router.push("/subscribe")}}>
+                <View style={styles.limitButton}>
+                <Text style={{fontSize: RFPercentage(3.5), fontFamily: 'bSemi', color:"#FEF8EC"}}> Remove All Limits </Text>
+                </View>
+              </TouchableOpacity>
             </View>
+
             <ProfileButton icon="person-outline" text="Profile" link="/profile"/>
             <ProfileButton icon="pricetag-outline" text="Subscribe" link="/subscribe" />
             <ProfileButton icon="star-outline" text="Rate Us" />
-            <ProfileButton icon="notifications-outline" text="Notifications" />
+            {/* <ProfileButton icon="notifications-outline" text="Notifications" /> */}
             <ProfileButton icon="call-outline" text="Feedback" pressFunction={onFeedbackPress} />
             <ProfileButton icon="share-outline" text="Share" pressFunction={onShare}/>
             <View style={styles.stroke}>
@@ -80,27 +92,28 @@ const settings = () => {
             <ExtraLink text="Privacy and Refunds" />
             <ExtraLink text="Support and FAQs" />
             <ExtraLink text="Three Minute Mornings by Coping.ai" />
-            <TouchableOpacity onPress={() => { logout();  router.replace("/login")}}>
+            {/* <TouchableOpacity onPress={() => { logout();  router.replace("/login")}}>
             <View style={styles.pageButton}>
             <Ionicons name="log-out-outline" size={30} color="black" />
             <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>Logout</Text>
             </View>
-            </TouchableOpacity>          
+            </TouchableOpacity>          */}
+            </ScrollView>       
     </SafeAreaView>
   )
 }
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
 
 main: {
-    flex:1,
-    backgroundColor:"#FEF8EC",
+flex:1,
+backgroundColor:"#FEF8EC",
 },
 
 topText: {
-paddingLeft: 15,
+marginLeft: 20,
 justifyContent:'center',
 },
 
@@ -109,13 +122,40 @@ minWidth: (0.9 * width),
 paddingLeft: 15,
 height: 2,
 backgroundColor: "black",
+margin:10,
+},
+
+profileButtonContainer:{
+elevation: 2,
+borderRadius:14,
+backgroundColor: '#FFEECD',
+margin:7,
+marginHorizontal:15,
+padding:1
 },
 
 pageButton: {
 flexDirection:'row',
 alignItems:'center',
-padding:15,
+padding:5,
 },
+
+limitButtonContainer:{
+  elevation: 2,
+  borderRadius:14,
+  alignItems:'center',
+  backgroundColor: '#011C2D',
+  margin:5,
+  marginHorizontal:15,
+  padding:1
+  },
+  
+  pageButton: {
+  flexDirection:'row',
+  alignItems:'center',
+  padding:10,
+  color:"#FEF8EC"
+  },
 
 extraLinks:{
 flexDirection:'column',

@@ -28,6 +28,10 @@ const responseListener = useRef();
 
 
 useEffect(() => {
+  console.log('user in USEeffect on GC', user)
+},[user])
+
+useEffect(() => {
     const subscriber = auth().onAuthStateChanged(async (authUser) => {
         if(authUser){
            try {
@@ -113,30 +117,56 @@ useEffect(() => {
 //Init Revenue Cat
 useEffect(() => {
   const setup = async () => {
+    
+  
     try{
     if (Platform.OS == "android") {      
       await Purchases.configure({ apiKey: 'googleAPIhere' });
     } else {
-      await Purchases.configure({ apiKey: 'appl_bKjBvIBLemkBPibcJuXbCyMAzvi' });
+      await Purchases.configure({ apiKey:'appl_bKjBvIBLemkBPibcJuXbCyMAzvi'});
     }
     Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-  }
-  catch (error) {
+
+    if(user && user.id) { 
+      console.log('the user id before logging in: ' + user.id)
+      await Purchases.logIn(user.id.toString());
+      const cusInfo  =  await Purchases.getCustomerInfo();
+      checkSubscriptionStatus(cusInfo);
+      console.log('customer now: ', cusInfo);
+      
+    }
+      else {console.log('no user exists yet')}      
+    }catch (error) {
     console.error('Error initializing RevenueCat:', error);
 }}
     setup();
-},[])
+},[user])
 
+const checkSubscriptionStatus = (customerInfo) => {
+  // Check multiple indicators of an active subscription
+  const hasActiveSubscription = 
+    customerInfo?.activeSubscriptions?.length > 0 || // Check active subscriptions array
+    Object.keys(customerInfo?.entitlements?.active || {}).length > 0 // Check active entitlements
+  
+  if (!hasActiveSubscription) {
+    console.log('No active subscription found')
+    setIsSubscribed(false)
+      if(user.subscriptionStatus !== "free") {
+        updateUser({...user, subscriptionStatus: "free"})
+      }
+  } else {
+    setIsSubscribed(true)
+  }
+}
 
 const login = async (userData) => {
-    setIsLoading(true)
+    
+  setIsLoading(true)
       try {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('isLoggedIn', 'true');
         setUser(userData);
-        await Purchases.logIn(userData.id);
         console.log('user at GC login function ' + JSON.stringify(user))
-        //console.log('user ID at GC  ' + user.id)  
         setIsLoggedIn(true);
         getNotificationToken();
         console.log(expoPushToken);
@@ -145,9 +175,6 @@ const login = async (userData) => {
         console.error('Error saving login data', error);
       }
       finally{
-        if(userData.subscriptionStatus !== "free"){
-          setIsSubscribed(true)
-        }
         setIsLoading(false);
         settingTheUser(userData)
       }
@@ -155,13 +182,19 @@ const login = async (userData) => {
 
     const logout = async () => {
         try {
+          setIsLoggedIn(false);
           await AsyncStorage.removeItem('user');
           await AsyncStorage.removeItem('isLoggedIn');
-          await auth().signOut();  
-          setUser(null);
-          setIsLoggedIn(false);
+          await auth().signOut();
+          setIsLoading(true)
+          setUser(null);  
         } catch (error) {
           console.error('Error removing login data', error);
+        }finally{
+          if(user){
+            console.log('user exists after logging off ', user)
+          }
+          (setIsLoading(false));
         }
       };
 
@@ -189,54 +222,65 @@ const login = async (userData) => {
         loadStoredData();
       }, []);  
 
+
+const updateUserSubscriptionStatus = async (subscriptionPlan) => {
+  console.log('we came here at update sub status! ')
+  await updateUser({...user, "subscriptionStatus": subscriptionPlan});
+    
+}
+
 const refreshAll = useCallback(async () => {
     await Promise.all([refreshUserData(), refreshEntries()]);
   }, [refreshUserData, refreshEntries]);
 
   const refreshUserData = useCallback(async () => {
-    if (user) {
-      const updatedUserData = user;
-      login(updatedUserData);
+    console.log('before calling by id', user.id)
+      const updatedUserData =  await getUserById((user.id));
+      console.log('user data in refresh : ', updatedUserData)
       return updatedUserData;
-    }
-  }, [user]);
+    
+  }, []);
 
   const refreshEntries = useCallback(async () => {
-    if (user) {
+  
       fetchAllEntries(user);
-    }
+    
   }, [user]);
 
-const fetchAllEntries = async (user) => {
+const fetchAllEntries = async () => {
 
-    console.log('fetch will happened for '+ user)
-    const userid = user.id
-    await getAll(userid)
-        .then(data => {
-            // console.log("Fetched data:", data); // Add this line
-            setEntries(data);
-            setEntriesLength(data.length);
-            console.log(entries.length);
+    console.log('fetch will happened for '+ JSON.stringify(user))
+   if(user){
+    await getAll((user.id))
+    .then(async data => {
+        // console.log("Fetched data:", data); // Add this line
+       
+        setEntries(data);
+        setEntriesLength(data.length);
+        //console.log(entries.length);
 
-            // console.log(data)
-        })
-        .catch(error => { console.log(error); })
+        // console.log(data)
+    })
+    .catch(error => { console.log(error); })
+   }
+    
 }
 
 const getAll = async (userid) => {
     console.log('get all happened')
     return fetch(API_URL + 'users/entries/' + userid)
-    .then(response => {
+    .then(async response => {
         if (response.status === 200) {
             console.log(response.json)
+
             return response.json();
         } else {
             // console.error(`Response error in getAll${type}: ${response.status}`);
-            throw new Error(`Response error in getAll in GC`);
+            throw new Error(`Response error in getAll in GC: `, error);
         }
     })
     .catch(error => {
-        console.error('Error fetching:', error);
+        console.error('Error fetching in :', error);
         throw error; 
     });
 }
@@ -252,22 +296,23 @@ const addEntry = async (entry) => {
               body: JSON.stringify(entry),
           });
           const data = await response.json();
-          console.log(data);
-          console.log(entries.length);
+          console.log('added entry data i n GC ', data);
+          console.log(entries.length); //remove
 
           await refreshAll();
           //setEntries(...preventries, data);
           console.log('Successfully added entry with ID at ADD Entry ' + data.id);
           return data.id;
       } catch (error) {
-          return console.error('Error fetching: ' + error);
+          return console.error('Error fetching in refreshall: ' + error);
       }
   };
 
   const deleteEntry = async (entryId) => {
     return fetch(API_URL + 'entry/user/' + user.id + '/' + entryId + '/', {method: 'DELETE'})
-        .then(() => {
+        .then(async () => {
           console.log(entryId + " deleted");
+          await refreshAll();
           return true;})
         .catch(error => console.error('Error deleting ' + entryId + ': ', error));
   };
@@ -308,7 +353,7 @@ const addEntry = async (entry) => {
     }
 }
 
-    const getEntryById = (id) =>{
+    const getEntryById = async (id) =>{
         return fetch( API_URL + 'entry/' + id)
         .then(response => response.json())
         .then(data => {
@@ -319,6 +364,17 @@ const addEntry = async (entry) => {
     })
     .catch(error => console.error('Error fetching: ' + type, error));
     }
+
+    const getUserById = async (id) =>{
+      return fetch( API_URL + 'users/' + id)
+      .then(response => response.json())
+      .then(data => {
+        setUser(data);
+      const foundUser = data
+      return foundUser;
+  })
+  .catch(error => console.error('Error fetching: ' + type, error));
+  }  
 
 
   const getGPTResponse = (entryID, prompt) => {
@@ -337,14 +393,15 @@ const addEntry = async (entry) => {
     });
 }
 
-const getGPTInstaPrompt = (entryID, prompt) => {
+const getGPTInstaPrompt = async (entryID, prompt) => {
     setIsLoading(true)
     console.log('this is the entry: ' + entryID + 'the prompt: ' + prompt)
     return fetch(API_URL + 'gptq/instaprompt?prompt=' + prompt + '&entryId=' + entryID )
     .then(response => response.json())
-    .then(data => {
+    .then(async data => {
           console.log('Successfully received ' + data.newQuestion);
           setIsLoading(false);
+          await refreshAll();
           return data
     })
     .catch(error => {
@@ -371,15 +428,13 @@ const updateUser = async (updatedUser) =>{
         }
     };
 
-    const canMakeEntry = async () => {
-        //const data = await refreshUserData();
-        console.log('subscription: ' + user.subscriptionStatus);
-        console.log('free entries : ' + user.remainingFreeEntries);
-        
-        if(user.subscriptionStatus !== "free") return true;
-        if(user.subscriptionStatus === 'free' && user.remainingFreeEntries > 0) return true;
-        else {return false;}
-      }
+const canMakeEntry = async () => {
+    console.log('is user subbed: ', isSubscribed);
+    console.log('is user remaining free entry: ', user.remainingFreeEntries);
+
+    if(isSubscribed || user.remainingFreeEntries > 0) {return true;}
+    else return false;
+  }
 
     const addFeedback = async (feedback) => {
       console.log(feedback)
@@ -400,7 +455,7 @@ const updateUser = async (updatedUser) =>{
     };
 
     return(
-        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

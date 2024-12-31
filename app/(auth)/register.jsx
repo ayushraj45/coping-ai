@@ -75,7 +75,7 @@ const createUser = async (firebaseUID, email, username, expoPushToken) => {
       "maxQuestions": 5,
       "email": email,
       "firebaseToken": expoPushToken,
-      "subscriptionStatus": "none"
+      "subscriptionStatus": "free"
     } 
 
 
