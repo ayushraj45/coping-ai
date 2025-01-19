@@ -68,6 +68,39 @@ const register = () => {
                      
     }
 
+    const createUserJustInSql = async (firebaseUID, email, username, expoPushToken) => {
+
+
+      const updatedUserData = {
+        "username": username,
+        "maxQuestions": 5,
+        "email": email,
+        "firebaseToken": expoPushToken,
+        "subscriptionStatus": "free"
+      } 
+
+      try {
+        const response = await fetch(API_URL + "users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+          },
+          body: JSON.stringify(updatedUserData),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("user registered from backend:", data);
+          return data;
+        } else {
+          const errorMessage = await response.text();
+          console.error("Error from backend:", errorMessage);
+        }
+      }catch (error) {
+        console.error("Error sending token to sql backend:", error);
+      }
+    }
+
 const createUser = async (firebaseUID, email, username, expoPushToken) => {
 
     const updatedUserData = {
@@ -79,17 +112,30 @@ const createUser = async (firebaseUID, email, username, expoPushToken) => {
     } 
 
 
-    console.log(updatedUserData)
+    console.log('here:',JSON.stringify(updatedUserData))
+    console.log('here is the UID :',firebaseUID)
 
+    console.log('here is the API IRL : ', API_URL)
     try {
-        const response = await fetch(API_URL + "firebase/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${firebaseUID}`, // Send token in Authorization header
-          },
-          body: JSON.stringify(updatedUserData)
-        });
+      console.log("Making fetch request with:");
+      console.log("URL:", API_URL + "firebase/register");
+      console.log("Headers:", {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${firebaseUID}`, // Send token in Authorization header
+      });
+      console.log("Body:", JSON.stringify(updatedUserData));
+    
+      const response = await fetch(API_URL + "firebase/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${firebaseUID}`, // Send token in Authorization header
+        },
+        body: JSON.stringify(updatedUserData),
+      });
+    
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
             if (response.ok) {
           const data = await response.json();
           console.log("user registered from backend:", data);
@@ -99,7 +145,7 @@ const createUser = async (firebaseUID, email, username, expoPushToken) => {
           console.error("Error from backend:", errorMessage);
         }
       } catch (error) {
-        console.error("Error sending token to backend:", error);
+        console.error("Error sending token to fireabse backend:", error);
       }
   };
 

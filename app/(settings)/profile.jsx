@@ -35,7 +35,7 @@ const handleEdit = useCallback(() => {
 const handleSave = async () => {
   setIsLoading(true)
 
-  const currentUser = await refreshUserData();
+  const currentUser = await getUserById(user.id);
   console.log('current user '+ JSON.stringify(currentUser))
   const updatedUser = {...currentUser, 
     username: tempUsername,

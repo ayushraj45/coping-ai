@@ -23,6 +23,33 @@ const getStarted = () => {
   // if (!isLoading && isLoggedIn) return <Redirect href="/homepage" />;
 
   
+  const getusers = async () => {
+    console.log('we are here')
+    try{
+      const userFound = await getUserById(1);
+      console.log('the user found: ', userFound)
+    } catch (error) {console.log(error)}
+}  
+
+
+const getUserById = async (id) => {
+  try {
+    console.log('Attempting fetch to:', 'http://coping-ai-app-env.eba-2n96bri8.eu-north-1.elasticbeanstalk.com/users/' + id);
+    const response = await fetch('http://coping-ai-app-env.eba-2n96bri8.eu-north-1.elasticbeanstalk.com/users/' + id);
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log('Full error object:', error);
+    console.log('Error name:', error.name);
+    console.log('Error message:', error.message);
+    throw error;
+  }
+}
 
   return (
     <View style={styles.container}>
@@ -43,6 +70,7 @@ const getStarted = () => {
         {/* Get Started Button */}
         <View style={styles.getStartedContainer}>
           <TouchableOpacity onPress={() => router.push("/register")}>
+          {/* <TouchableOpacity onPress={getusers}> */}
             <View style={styles.getStarted}>
               <Text style={styles.buttonText}>Get Started</Text>
             </View>

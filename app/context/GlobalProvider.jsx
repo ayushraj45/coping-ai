@@ -11,7 +11,7 @@ import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases'
 import { Platform } from "react-native";
 
 const GlobalProvider = ({ children }) => {
-const API_URL = 'http://192.168.1.204:8080/';
+const API_URL ='https://4idii2equest.coping-ai.com/';
 const [entries, setEntries] = useState([]);
 const [entriesLength, setEntriesLength] = useState(0);
 const [isLoading, setIsLoading] = useState(true);
@@ -251,6 +251,7 @@ const fetchAllEntries = async () => {
 
     console.log('fetch will happened for '+ JSON.stringify(user))
    if(user){
+    console.log('user at fetch all: ', user)
     await getAll((user.id))
     .then(async data => {
         // console.log("Fetched data:", data); // Add this line
@@ -286,7 +287,7 @@ const getAll = async (userid) => {
 }
 
 const addEntry = async (entry) => {
-    console.log(entry)
+    console.log('entry to be added ', entry)
     try {
           const response = await fetch(API_URL + 'entry', {
               method: 'POST',
@@ -296,15 +297,15 @@ const addEntry = async (entry) => {
               body: JSON.stringify(entry),
           });
           const data = await response.json();
-          console.log('added entry data i n GC ', data);
+          console.log('added entry data in GC ', data);
           console.log(entries.length); //remove
 
-          await refreshAll();
-          //setEntries(...preventries, data);
+        
+          //setEntries([...prev, data]);
           console.log('Successfully added entry with ID at ADD Entry ' + data.id);
           return data.id;
       } catch (error) {
-          return console.error('Error fetching in refreshall: ' + error);
+          return console.error('Error in add all: ' + error);
       }
   };
 
@@ -379,7 +380,7 @@ const addEntry = async (entry) => {
 
   const getGPTResponse = (entryID, prompt) => {
     setIsLoading(true)
-    console.log('this is the entry: ' + entryID + 'the prompt: ' + prompt)
+    console.log('check out the link', API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
     return fetch(API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
     .then(response => response.json())
     .then(data => {
@@ -401,7 +402,7 @@ const getGPTInstaPrompt = async (entryID, prompt) => {
     .then(async data => {
           console.log('Successfully received ' + data.newQuestion);
           setIsLoading(false);
-          await refreshAll();
+          //await refreshAll();
           return data
     })
     .catch(error => {

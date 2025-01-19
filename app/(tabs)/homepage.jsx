@@ -41,8 +41,10 @@ const homepage = () => {
 
   useEffect(() => {
     if(user){
+
       setUserId(user.id); 
       setUserName(user.username)
+    
     }
   }, [user]);
 
@@ -92,7 +94,7 @@ const homepage = () => {
 
   const handleNewEntry = async () => {
     console.log(selectedItem);
-    setIsloading(true);
+    //setIsloading(true);
     setCustomFeeling('');
     const allowEntry = await canMakeEntry();
     console.log('allow entry is true or not: ', allowEntry)
@@ -104,7 +106,7 @@ const homepage = () => {
     }
     else {
     setIsloading(true);
-    console.log(selectedItem);
+    
     const currentDateTime = getCurrentDateTime();
 
     const initialEntry = {
@@ -116,13 +118,17 @@ const homepage = () => {
       "content": "",
       "questionCount": 0
     }   
-
+    console.log('just before doing newEntryId ', selectedItem);
     const newEntryId = await addEntry(initialEntry);
+    console.log('new entry ID after adding an entry ', newEntryId )
 
     if(newEntryId) {
+      console.log('new entry ID has been taken ');
+      console.log('new entry ID ',newEntryId )
       if(selectedItem.listType === "instaprompt") {
         try{
           const data = await getGPTInstaPrompt(newEntryId, selectedItem.prompt);
+          console.log('new entry ID after getting ', data )
           if(data) {
             setIsloading(false);
             router.push({
@@ -155,10 +161,10 @@ const homepage = () => {
         }
       } 
     
-    // } else {
-    //   console.log('failed to create new entry to begin with, so we never got new ID')
-    // }
-  }
+    } else {
+      console.log('failed to create new entry to begin with, so we never got new ID')
+    }
+  //}
   }
 }
 

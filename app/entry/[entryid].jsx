@@ -8,6 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useGlobalContext } from '../context/GlobalProvider';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 const userEntry = () => {
 
@@ -121,6 +122,9 @@ const handleApiUpdate = async () => {
       >
          
             <SafeAreaView style={{ flex: 1 }}>
+            <TouchableOpacity onPress={()=> {router.back()}}>
+              <Ionicons name="chevron-back" size={24} color="black" />
+            </TouchableOpacity>
                 <View style={styles.title}>
                     <TextInput
                     numberOfLines={1}

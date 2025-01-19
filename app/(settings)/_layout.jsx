@@ -18,6 +18,12 @@ const SettingsLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="faqs"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );

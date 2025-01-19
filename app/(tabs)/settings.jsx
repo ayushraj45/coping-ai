@@ -6,11 +6,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useGlobalContext } from '../context/GlobalProvider';
 import FeedbackPrompt from '../../components/FeedbackPrompt';
+import ExternalUriModal from '../../components/ExternalUriModal';
 
 const settings = () => {
 
   const { logout } = useGlobalContext();
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showTmmPopup, setShowTmmPopup ] = useState(false);
+  const [showTermsPopup , setShowTermsPopup ] = useState(false);
+
 
   const onFeedbackPress = () => {
     setShowFeedback(true);
@@ -38,6 +42,13 @@ const settings = () => {
     }
   };
 
+  const showPopups = (popup) => {
+    if(popup === 'terms') {
+      setShowTermsPopup(true)
+    }
+    else
+      setShowTmmPopup(true)
+  }
 
   const ProfileButton = ({icon, text, link, pressFunction}) => {
     return (
@@ -52,9 +63,9 @@ const settings = () => {
     )
   }
 
-  const ExtraLink = ({text}) => {
+  const ExtraLink = ({text, popup}) => {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => {showPopups(popup)}}>
         <View style={styles.extraLinks}>
           <Text style={{ fontSize: RFPercentage(2), fontFamily: 'cLight' }}>{text}</Text>
         </View>
@@ -65,6 +76,9 @@ const settings = () => {
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView>
+      <ExternalUriModal visible={showTermsPopup} onClose={() => {setShowTermsPopup(false)}} link={'https://www.coping-ai.com/terms.html'}/>   
+      <ExternalUriModal visible={showTmmPopup} onClose={() => {setShowTmmPopup(false)}} link={'https://www.amazon.co.uk/Three-Minute-Mornings-Gratitude-Productivity/dp/B0D36ZC6YR/'}/>   
+
       <FeedbackPrompt visible={showFeedback} onClose={() => {setShowFeedback(false)}}/>
             <View style={styles.topText}>
               <Text style={{fontSize: RFPercentage(4), fontFamily: 'bSemi'}}>Settings </Text>
@@ -88,10 +102,14 @@ const settings = () => {
             <ProfileButton icon="share-outline" text="Share" pressFunction={onShare}/>
             <View style={styles.stroke}>
             </View>
-            <ExtraLink text="Terms and Conditions" />
-            <ExtraLink text="Privacy and Refunds" />
-            <ExtraLink text="Support and FAQs" />
-            <ExtraLink text="Three Minute Mornings by Coping.ai" />
+            <ExtraLink text="Three Minute Mornings by Coping.ai" popup={'tmm'} /> 
+            <ExtraLink text="Terms and Conditions" popup={'terms'}/>
+            <ExtraLink text="Privacy and Refunds" popup={'terms'}/>
+            <TouchableOpacity onPress={() => {router.push("/faqs")}}>
+             <View style={styles.extraLinks}>
+                <Text style={{ fontSize: RFPercentage(2), fontFamily: 'cLight' }}>Support and FAQs</Text>
+              </View>
+             </TouchableOpacity>
             {/* <TouchableOpacity onPress={() => { logout();  router.replace("/login")}}>
             <View style={styles.pageButton}>
             <Ionicons name="log-out-outline" size={30} color="black" />
