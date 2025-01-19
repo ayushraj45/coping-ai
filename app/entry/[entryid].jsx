@@ -29,8 +29,8 @@ const [isLoading, setIsLoading] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
 
   useEffect(()  => {
-    console.log('Params received at entryid]:', params);
-    console.log('ID from params at entryId]:', params.entryid);
+   // console.log('Params received at entryid]:', params);
+    //console.log('ID from params at entryId]:', params.entryid);
     setIsLoading(true)
     loadEntry();
 
@@ -44,7 +44,7 @@ const [isLoading, setIsLoading] = useState(false);
   const loadEntry = async () => {
     try {
       const fetchedEntry = await getEntryById(params.entryid);
-      console.log('fetched entry after making it: ', fetchedEntry)
+      //console.log('fetched entry after making it: ', fetchedEntry)
       if (fetchedEntry) {
         setEntry(fetchedEntry);
         setTitle(fetchedEntry.title);

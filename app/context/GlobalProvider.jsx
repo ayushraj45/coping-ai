@@ -27,9 +27,9 @@ const notificationListener = useRef();
 const responseListener = useRef();
 
 
-useEffect(() => {
-  console.log('user in USEeffect on GC', user)
-},[user])
+// useEffect(() => {
+//   console.log('user in USEeffect on GC', user)
+// },[user])
 
 useEffect(() => {
     const subscriber = auth().onAuthStateChanged(async (authUser) => {
@@ -37,7 +37,7 @@ useEffect(() => {
            try {
                setIsLoading(true);
                const idToken = await authUser.getIdToken();
-               console.log(idToken);
+               //console.log(idToken);
                const sqlUser = await getUserByProvider (idToken);
                login(sqlUser);
             } catch (error) {
@@ -62,17 +62,17 @@ useEffect(() => {
   
     notificationListener.current = 
       Notifications.addNotificationReceivedListener((notification) => {
-        console.log("🔔 Notification Received: ", notification);
+        //console.log("🔔 Notification Received: ", notification);
         setNotification(notification);     
       })
   
       responseListener.current =
         Notifications.addNotificationResponseReceivedListener((response) => {
-          console.log(
-            "🔔 Notification Response: ",
-            JSON.stringify(response, null, 2),
-            JSON.stringify(response.notification.request.content.data, null, 2)
-          );
+          // console.log(
+          //   "🔔 Notification Response: ",
+          //   JSON.stringify(response, null, 2),
+          //   JSON.stringify(response.notification.request.content.data, null, 2)
+          // );
           // Handle the notification response here
         });
   
@@ -103,14 +103,14 @@ useEffect(() => {
         });
             if (response.ok) {
           const data = await response.json();
-          console.log("user registered from backend:", data);
+          //console.log("user registered from backend:", data);
           return data;
         } else {
           const errorMessage = await response.text();
-          console.error("Error from backend:", errorMessage);
+          //console.error("Error from backend:", errorMessage);
         }
       } catch (error) {
-        console.error("Error sending token to backend:", error);
+        //console.error("Error sending token to backend:", error);
       }
 }
 
@@ -128,16 +128,17 @@ useEffect(() => {
     Purchases.setLogLevel(LOG_LEVEL.DEBUG);
 
     if(user && user.id) { 
-      console.log('the user id before logging in: ' + user.id)
+      //console.log('the user id before logging in: ' + user.id)
       await Purchases.logIn(user.id.toString());
       const cusInfo  =  await Purchases.getCustomerInfo();
       checkSubscriptionStatus(cusInfo);
-      console.log('customer now: ', cusInfo);
+      //console.log('customer now: ', cusInfo);
       
     }
-      else {console.log('no user exists yet')}      
+      else {//console.log('no user exists yet')
+        }      
     }catch (error) {
-    console.error('Error initializing RevenueCat:', error);
+    //console.error('Error initializing RevenueCat:', error);
 }}
     setup();
 },[user])
@@ -149,7 +150,7 @@ const checkSubscriptionStatus = (customerInfo) => {
     Object.keys(customerInfo?.entitlements?.active || {}).length > 0 // Check active entitlements
   
   if (!hasActiveSubscription) {
-    console.log('No active subscription found')
+    //console.log('No active subscription found')
     setIsSubscribed(false)
       if(user.subscriptionStatus !== "free") {
         updateUser({...user, subscriptionStatus: "free"})
@@ -166,10 +167,10 @@ const login = async (userData) => {
         await AsyncStorage.setItem('user', JSON.stringify(userData));
         await AsyncStorage.setItem('isLoggedIn', 'true');
         setUser(userData);
-        console.log('user at GC login function ' + JSON.stringify(user))
+        //console.log('user at GC login function ' + JSON.stringify(user))
         setIsLoggedIn(true);
         getNotificationToken();
-        console.log(expoPushToken);
+        //console.log(expoPushToken);
         fetchAllEntries(user)
       } catch (error) {
         console.error('Error saving login data', error);
@@ -192,7 +193,7 @@ const login = async (userData) => {
           console.error('Error removing login data', error);
         }finally{
           if(user){
-            console.log('user exists after logging off ', user)
+           // console.log('user exists after logging off ', user)
           }
           (setIsLoading(false));
         }
@@ -224,7 +225,7 @@ const login = async (userData) => {
 
 
 const updateUserSubscriptionStatus = async (subscriptionPlan) => {
-  console.log('we came here at update sub status! ')
+ // console.log('we came here at update sub status! ')
   await updateUser({...user, "subscriptionStatus": subscriptionPlan});
     
 }
@@ -234,9 +235,9 @@ const refreshAll = useCallback(async () => {
   }, [refreshUserData, refreshEntries]);
 
   const refreshUserData = useCallback(async () => {
-    console.log('before calling by id', user.id)
+    //console.log('before calling by id', user.id)
       const updatedUserData =  await getUserById((user.id));
-      console.log('user data in refresh : ', updatedUserData)
+      //console.log('user data in refresh : ', updatedUserData)
       return updatedUserData;
     
   }, []);
@@ -249,9 +250,9 @@ const refreshAll = useCallback(async () => {
 
 const fetchAllEntries = async () => {
 
-    console.log('fetch will happened for '+ JSON.stringify(user))
+   // console.log('fetch will happened for '+ JSON.stringify(user))
    if(user){
-    console.log('user at fetch all: ', user)
+    //console.log('user at fetch all: ', user)
     await getAll((user.id))
     .then(async data => {
         // console.log("Fetched data:", data); // Add this line
@@ -268,11 +269,11 @@ const fetchAllEntries = async () => {
 }
 
 const getAll = async (userid) => {
-    console.log('get all happened')
+    //console.log('get all happened')
     return fetch(API_URL + 'users/entries/' + userid)
     .then(async response => {
         if (response.status === 200) {
-            console.log(response.json)
+            //console.log(response.json)
 
             return response.json();
         } else {
@@ -287,7 +288,7 @@ const getAll = async (userid) => {
 }
 
 const addEntry = async (entry) => {
-    console.log('entry to be added ', entry)
+    //console.log('entry to be added ', entry)
     try {
           const response = await fetch(API_URL + 'entry', {
               method: 'POST',
@@ -297,12 +298,12 @@ const addEntry = async (entry) => {
               body: JSON.stringify(entry),
           });
           const data = await response.json();
-          console.log('added entry data in GC ', data);
-          console.log(entries.length); //remove
+         // console.log('added entry data in GC ', data);
+          //console.log(entries.length); //remove
 
         
           //setEntries([...prev, data]);
-          console.log('Successfully added entry with ID at ADD Entry ' + data.id);
+          //onsole.log('Successfully added entry with ID at ADD Entry ' + data.id);
           return data.id;
       } catch (error) {
           return console.error('Error in add all: ' + error);
@@ -312,7 +313,7 @@ const addEntry = async (entry) => {
   const deleteEntry = async (entryId) => {
     return fetch(API_URL + 'entry/user/' + user.id + '/' + entryId + '/', {method: 'DELETE'})
         .then(async () => {
-          console.log(entryId + " deleted");
+          //console.log(entryId + " deleted");
           await refreshAll();
           return true;})
         .catch(error => console.error('Error deleting ' + entryId + ': ', error));
@@ -328,7 +329,7 @@ const addEntry = async (entry) => {
             body: JSON.stringify(entry),
         });
         const data = await response.json();
-        console.log('Successfully updated ' + data.id);
+        //console.log('Successfully updated ' + data.id);
         return data;
     } catch (error) {
         return console.error('Error updating: ' + error);
@@ -337,19 +338,19 @@ const addEntry = async (entry) => {
 
   const getEntry = async (id) => {
         
-    console.log('ID received at fetched entry:' + id)
-    console.log('Type of ID:', typeof id);
+    //console.log('ID received at fetched entry:' + id)
+    //console.log('Type of ID:', typeof id);
     const numId = typeof id === 'string' ? parseInt(id, 10) : id;
-    console.log('did the new entry come here' + entries)
+    //console.log('did the new entry come here' + entries)
     await refreshEntries();
     const foundEntry = entries.find(entry => entry.id === numId);
     if(foundEntry){
-    console.log('Found entry without api:', foundEntry)
+   // console.log('Found entry without api:', foundEntry)
     return foundEntry;
     }
     else{
         const foundEntryFromApi = await getEntryById(id)
-        console.log('Found entry WITH api:', foundEntryFromApi)
+       // console.log('Found entry WITH api:', foundEntryFromApi)
         return foundEntryFromApi;
     }
 }
@@ -359,7 +360,7 @@ const addEntry = async (entry) => {
         .then(response => response.json())
         .then(data => {
         //   console.log(data);
-        console.log('Successfully received the entry from this api ' + data);
+        //console.log('Successfully received the entry from this api ' + data);
         const foundEntry = data
         return foundEntry;
     })
@@ -380,33 +381,33 @@ const addEntry = async (entry) => {
 
   const getGPTResponse = (entryID, prompt) => {
     setIsLoading(true)
-    console.log('check out the link', API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
+   // console.log('check out the link', API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
     return fetch(API_URL + 'gptq/chat?prompt=' + prompt + '&entryId=' + entryID )
     .then(response => response.json())
     .then(data => {
-          console.log('Successfully received ' + data.newQuestion);
+          //console.log('Successfully received ' + data.newQuestion);
           setIsLoading(false);
           return data
     })
     .catch(error => {
-        console.error('Error fetching:', error);
+        //console.error('Error fetching:', error);
         throw error; 
     });
 }
 
 const getGPTInstaPrompt = async (entryID, prompt) => {
     setIsLoading(true)
-    console.log('this is the entry: ' + entryID + 'the prompt: ' + prompt)
+    //console.log('this is the entry: ' + entryID + 'the prompt: ' + prompt)
     return fetch(API_URL + 'gptq/instaprompt?prompt=' + prompt + '&entryId=' + entryID )
     .then(response => response.json())
     .then(async data => {
-          console.log('Successfully received ' + data.newQuestion);
+          //console.log('Successfully received ' + data.newQuestion);
           setIsLoading(false);
           //await refreshAll();
           return data
     })
     .catch(error => {
-        console.error('Error fetching:', error);
+       // console.error('Error fetching:', error);
         throw error; 
     });
 }
@@ -421,7 +422,7 @@ const updateUser = async (updatedUser) =>{
         body: JSON.stringify(updatedUser),
             });
             const data = await response.json();
-            console.log('Successfully updated ' + data.id);
+            //console.log('Successfully updated ' + data.id);
             login(data);
             return data;
         } catch (error) {
@@ -430,15 +431,15 @@ const updateUser = async (updatedUser) =>{
     };
 
 const canMakeEntry = async () => {
-    console.log('is user subbed: ', isSubscribed);
-    console.log('is user remaining free entry: ', user.remainingFreeEntries);
+   // console.log('is user subbed: ', isSubscribed);
+    //console.log('is user remaining free entry: ', user.remainingFreeEntries);
 
     if(isSubscribed || user.remainingFreeEntries > 0) {return true;}
     else return false;
   }
 
     const addFeedback = async (feedback) => {
-      console.log(feedback)
+      //console.log(feedback)
       try {
             const response = await fetch(API_URL + 'feedbacks', {
                 method: 'POST',
@@ -448,7 +449,7 @@ const canMakeEntry = async () => {
                 body: JSON.stringify(feedback),
             });
             const data = await response.json();
-            console.log(data);
+            //console.log(data);
             if (data) {return true;}
         } catch (error) {
             return console.error('Error adding Feedback: ' + error);

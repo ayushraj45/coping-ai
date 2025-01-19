@@ -12,7 +12,15 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "distribution": "store",
+      "autoIncrement": true,
+        "ios": {
+        "simulator": false,
+        "autoIncrement": true
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {

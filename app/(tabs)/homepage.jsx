@@ -62,7 +62,7 @@ const homepage = () => {
     else{
     setSelectedItem(newItem);
     setSelectedButton(null);
-    console.log(selectedItem); // log the updated value
+    //console.log(selectedItem); // log the updated value
     }
   };
 
@@ -93,11 +93,11 @@ const homepage = () => {
   };
 
   const handleNewEntry = async () => {
-    console.log(selectedItem);
+    //console.log(selectedItem);
     //setIsloading(true);
     setCustomFeeling('');
     const allowEntry = await canMakeEntry();
-    console.log('allow entry is true or not: ', allowEntry)
+    //console.log('allow entry is true or not: ', allowEntry)
     if(!allowEntry){
       setShowSubscribeNotice(true);
       setSelectedButton(null);
@@ -118,17 +118,17 @@ const homepage = () => {
       "content": "",
       "questionCount": 0
     }   
-    console.log('just before doing newEntryId ', selectedItem);
+    //console.log('just before doing newEntryId ', selectedItem);
     const newEntryId = await addEntry(initialEntry);
-    console.log('new entry ID after adding an entry ', newEntryId )
+    //console.log('new entry ID after adding an entry ', newEntryId )
 
     if(newEntryId) {
-      console.log('new entry ID has been taken ');
-      console.log('new entry ID ',newEntryId )
+      //console.log('new entry ID has been taken ');
+     // console.log('new entry ID ',newEntryId )
       if(selectedItem.listType === "instaprompt") {
         try{
           const data = await getGPTInstaPrompt(newEntryId, selectedItem.prompt);
-          console.log('new entry ID after getting ', data )
+          //console.log('new entry ID after getting ', data )
           if(data) {
             setIsloading(false);
             router.push({
@@ -139,7 +139,7 @@ const homepage = () => {
             setSelectedButton(null);
           } 
         } catch (error) {
-          console.log('failed to create new entry at instaprompt')
+          //console.log('failed to create new entry at instaprompt')
           console.error(error)
         }
       }
@@ -162,7 +162,7 @@ const homepage = () => {
       } 
     
     } else {
-      console.log('failed to create new entry to begin with, so we never got new ID')
+      //console.log('failed to create new entry to begin with, so we never got new ID')
     }
   //}
   }
