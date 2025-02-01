@@ -20,7 +20,7 @@ export default function Index() {
         if (initializing) return; // Wait for Firebase initialization
         if (user) {
           
-          router.replace("/homepage");
+          router.replace("/homepage2");
         } else {
             router.replace("/getStarted");
         }
