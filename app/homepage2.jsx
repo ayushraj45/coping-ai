@@ -60,13 +60,15 @@ const homepage2 = () => {
           </View>
           <BottomSheet
                 ref={bottomSheetRef}
-                index={-1}
+                index={0}
                 snapPoints={snapPoints}
                 enablePanDownToClose={true}
             >
-                <ScrollView>
+                {/* <ScrollView>
                     <EntryChoice number={1} title={'Mood'} content={'Start with how you are feeling'} color={'#FFD788'}/>
-                </ScrollView>
+                </ScrollView> */}
+
+                <Text> Hey there what's up </Text>
                
             </BottomSheet>
         </View>
