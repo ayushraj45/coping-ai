@@ -1,5 +1,4 @@
-// import 'react-native-gesture-handler';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
+ import 'react-native-gesture-handler';
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -42,6 +41,7 @@ const RootLayout = () => {
   });
 
   return (
+   
     <GlobalProvider>
       <Stack>
         <Stack.Screen name="index" options={{headerShown: false}}/>
@@ -57,7 +57,6 @@ const RootLayout = () => {
 
       </Stack>
     </GlobalProvider>
-  
   );
 }
 
