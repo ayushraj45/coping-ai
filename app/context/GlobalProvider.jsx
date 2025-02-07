@@ -431,8 +431,8 @@ const updateUser = async (updatedUser) =>{
     };
 
 const canMakeEntry = async () => {
-   // console.log('is user subbed: ', isSubscribed);
-    //console.log('is user remaining free entry: ', user.remainingFreeEntries);
+   console.log('is user subbed: ', isSubscribed);
+    console.log('is user remaining free entry: ', user.remainingFreeEntries);
 
     if(isSubscribed || user.remainingFreeEntries > 0) {return true;}
     else return false;
@@ -457,7 +457,7 @@ const canMakeEntry = async () => {
     };
 
     return(
-        <GlobalContext.Provider value={{fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{ fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

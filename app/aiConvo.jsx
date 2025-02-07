@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableWithoutFeedback, Keyboard, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert, BackHandler } from 'react-native'
 import React, { Children, useEffect, useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import SmallLogo from '../assets/icons/SmallLogo'
 import { Ionicons } from '@expo/vector-icons'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { useGlobalContext } from './context/GlobalProvider'
 import RotatingLogoLoader from '../components/RotatingLogoLoader'
 
@@ -51,6 +51,35 @@ const aiConvo = () => {
         }
       };
 
+
+      useFocusEffect(
+        React.useCallback(() => {
+          const onBackPress = () => {
+            Alert.alert(
+              'Entry Used',
+              'You haveve used one of your 10 free journal entries(Free Plan only). Continue exploring or upgrade to unlock unlimited journaling.',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                  onPress: () => false // Prevents default back behavior
+                },
+                {
+                  text: 'OK', 
+                  onPress: () => router.back()
+                }
+              ]
+            );
+            return true; // Prevents default back behavior
+          };
+    
+          BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    
+          return () => 
+            BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [])
+      );
+
     return (
         <SafeAreaView style={styles.safeArea}>
           <RotatingLogoLoader isLoading={isLoading}/>
@@ -59,6 +88,24 @@ const aiConvo = () => {
             style={styles.keyboardAvoid}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
           >
+          <TouchableOpacity onPress={() => {
+              Alert.alert(
+                'Entry Used',
+                'You have used one of your free journal entries(Free Plan Only). Continue exploring or upgrade to unlock unlimited journaling.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'OK', 
+                    onPress: () => router.back()
+                  }
+                ]
+              );
+            }}>
+                <Ionicons name="chevron-back" size={24} color="black" />
+          </TouchableOpacity> 
             <ScrollView
               style={{flexGrow:1,}} 
               contentContainerStyle={styles.scrollContainer}

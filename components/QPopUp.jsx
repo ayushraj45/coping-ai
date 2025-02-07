@@ -47,7 +47,7 @@ const QPopUp = ({ visible, questions , onClose }) => {
             style={styles.closeButton}
             onPress={onClose}
           >
-            <Text style={styles.closeButtonText}>×</Text>
+            <Text style={styles.closeButtonText}>Close (×)</Text>
           </TouchableOpacity>
           <ScrollView style={styles.conversationContainer} contentContainerStyle={{
             paddingBottom: 130,
@@ -71,10 +71,10 @@ const QPopUp = ({ visible, questions , onClose }) => {
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'space-around',
     alignItems: "center",
-    marginTop: 22,
-
+    paddingTop: 50,
+    backgroundColor: 'rgba(0,0,0,0.5)'
 
   },
   modalView: {
@@ -99,8 +99,9 @@ const styles = StyleSheet.create({
     top: 10,
   },
   closeButtonText: {
-    fontSize: 24,
+    fontSize: 14,
     fontWeight: 'bold',
+    color:'red'
   },
   modalText: {
     marginBottom: 15,

@@ -9,6 +9,7 @@ import { useGlobalContext } from '../context/GlobalProvider';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 
 const userEntry = () => {
 
@@ -153,8 +154,7 @@ const handleApiUpdate = async () => {
                     </TouchableOpacity>
                     
                 </View>
-
-                <JPPopUp visible={showJPPopUp} text={showJPPopUpText} onClose={() => setShowJPPopUp(false)} />
+                <JPPopUp visible={showJPPopUp} text={showJPPopUpText} onClose={() => setShowJPPopUp(false)} />  
                 <QPopUp visible={showQPopUp} questions={showQPopUpText} onClose={() => setShowQPopUp(false)}/>
                 <ScrollView>
                 {/* <DismissKeyboard/> */}

@@ -17,7 +17,7 @@ const JPPopUp = ({ visible, text, onClose }) => {
                             style={styles.closeButton}
                             onPress={onClose}
                         >
-                            <Text style={styles.closeButtonText}>×</Text>
+                            <Text style={styles.closeButtonText}>Close (x)</Text>
                         </TouchableOpacity>
                         <Text style={styles.modalText}>
                            {text}
@@ -34,14 +34,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    //marginTop: 22,
+    backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalView: {
     margin: 20,
     backgroundColor: "#D9D9D9",
     borderRadius: 20,
     padding: 35,
-    minWidth:'80%',
+   // minWidth:'80%',
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -58,8 +59,9 @@ const styles = StyleSheet.create({
     top: 10,
   },
   closeButtonText: {
-    fontSize: 24,
+    fontSize: 14,
     fontWeight: 'bold',
+    color:'red'
   },
   modalText: {
     marginBottom: 15,
