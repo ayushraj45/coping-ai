@@ -36,7 +36,7 @@ const preAiConvo = () => {
     return `${day}-${month}-${year}, ${hours}:${minutes}`;
     };  
 
-    const handleEmotionPress = async (prompt) =>{
+    const handleEmotionPress = async (prompt,text) =>{
         setIsloading(true);
         
         const currentDateTime = getCurrentDateTime();
@@ -44,7 +44,7 @@ const preAiConvo = () => {
         const initialEntry = {
         "userId": userId, // add from gc
         "title": currentDateTime,
-        "initFeeling": "",
+        "initFeeling": (text) ? text : prompt,
         "questions": [],
         "answers": [],
         "content": "",
@@ -158,7 +158,7 @@ const preAiConvo = () => {
       
     const OptionButton = ({text, color, prompt}) => {
         return (
-           <TouchableOpacity onPress={() => {handleEmotionPress(prompt)}}>
+           <TouchableOpacity onPress={() => {handleEmotionPress(prompt, text)}}>
                 <View style={[{backgroundColor:color}, styles.optionButton]}>
                     <Text style={{ fontSize: RFPercentage(2), fontFamily:'cMedium'}}>
                     {text}

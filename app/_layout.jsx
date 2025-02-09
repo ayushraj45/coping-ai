@@ -47,6 +47,8 @@ const RootLayout = () => {
       <Stack>
         <Stack.Screen name="index" options={{headerShown: false}}/>
         <Stack.Screen name="homepage2" options={{headerShown: false}}/>
+        <Stack.Screen name="allEntries" options={{headerShown: false}}/>
+        <Stack.Screen name="settings" options={{headerShown: false}}/>
         <Stack.Screen name="preAiConvo" options={{headerShown: false}}/>
         <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
         <Stack.Screen name="(auth)" options={{headerShown: false}}/>

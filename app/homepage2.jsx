@@ -24,6 +24,8 @@ const homepage2 = () => {
     const [username, setUserName] = useState('');
     const {canMakeEntry, user} = useGlobalContext();
     const [showSubsribeNotice, setShowSubscribeNotice ] = useState(false)
+    const [allowEntry, setAllowEntry ] = useState(false)
+
 
     // callbacks
     // const handleSheetChanges = useCallback((index) => {
@@ -39,12 +41,15 @@ const homepage2 = () => {
 
     const handleOpenSheet = useCallback( async () => {
         const allowEntry = await canMakeEntry();
-        console.log(allowEntry)
+        console.log('can make entry here: ',allowEntry)
+
+        if(await canMakeEntry()) {setAllowEntry(true)} else setAllowEntry(false)
         if(allowEntry){
             setIsSheetOpen(true);
             setIndex(0);
             bottomSheetRef?.current?.expand();
             console.log(bottomSheetRef)
+            setAllowEntry(false);
         }
         else{
             setShowSubscribeNotice(true);

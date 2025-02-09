@@ -96,7 +96,7 @@ const increment = () => {
 };
 
 const decrement = () => {
-  if (tempValue > 2) {
+  if (tempValue > 1) {
     const newValue = tempValue - 1;
     setTempValue(newValue);
   }
@@ -108,6 +108,9 @@ return (
       flex:1,
       backgroundColor:"#FEF8EC",
   }}>
+          <TouchableOpacity onPress={()=> {router.back()}}>
+              <Ionicons name="chevron-back" size={30} color="black" />
+            </TouchableOpacity>
       <View style={styles.logoContainer}>
         <ProfileLogo />
       </View>

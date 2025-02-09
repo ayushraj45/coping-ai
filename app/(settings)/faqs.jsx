@@ -30,6 +30,8 @@ const FAQList = ({ faqs }) => {
 // Sample Usage
 const FAQsPage = () => {
   const faqData = [
+    { question: 'What is Coping.ai?', answer: 'Coping.ai is your personal diary powered up by AI, making it an amazing tool for journaling and improving mental health.' },
+    { question: 'How to use Coping.ai?', answer: 'Imagine getting a prompt every time you want to make an entry to your diary. With Coping.ai, you will spend more time writing than thinking about what to write. Not only is it efficient, it is personal and insightful. Coping.ai asks you questions and helps you make most of your memories and feelings. Explore different themes and build an everlasting habit of journaling.' },
     { question: 'How do I connect to get help or support?', answer: 'You can either use the feeback form on the settings page or contact us here: coping.ai.app@gmail.com' },
     { question: 'How secure is my data?', answer: 'When you login to coping you only give us your email, we use industry standard encryption to keep any data from leaking.' },
     { question: 'Is this app free?', answer: 'Yes, the app is free to use. You will get 10 free entries every week. We only charge to remove limits to help with the cost of operations.' },
@@ -47,6 +49,7 @@ const FAQsPage = () => {
         <Ionicons name="chevron-back" size={24} color="black" />
     </TouchableOpacity>
       <Text style={styles.header}>FAQs</Text>
+      <Text style={{fontSize:15, fontStyle:'cLight', textAlign:'center', marginBottom:15,}}>Tap on a question to expand</Text>
       <FAQList faqs={faqData} />
     </SafeAreaView>
   );

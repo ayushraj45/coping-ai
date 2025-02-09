@@ -5,6 +5,8 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import IndexLogo from '../../assets/icons/IndexLogo'
 import PricingPanel from '../../components/PricingPanel'
 import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases';
+import { Ionicons } from '@expo/vector-icons'
+import { router } from 'expo-router'
 
 
 
@@ -13,6 +15,9 @@ const subscribe = () => {
   return (
     
       <View style={styles.container}>
+                  <TouchableOpacity onPress={()=> {router.back()}} style={{alignSelf:'flex-start'}}>
+              <Ionicons name="chevron-back" size={30} color="black" />
+            </TouchableOpacity>
         <View style={styles.headerText}>
           <Text style={{fontSize: RFPercentage(4), fontFamily:'bSemi'}}> Get Coping Pro</Text>
         </View>

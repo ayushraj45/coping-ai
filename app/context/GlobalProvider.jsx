@@ -150,7 +150,7 @@ const checkSubscriptionStatus = (customerInfo) => {
     Object.keys(customerInfo?.entitlements?.active || {}).length > 0 // Check active entitlements
   
   if (!hasActiveSubscription) {
-    //console.log('No active subscription found')
+    console.log('No active subscription found')
     setIsSubscribed(false)
       if(user.subscriptionStatus !== "free") {
         updateUser({...user, subscriptionStatus: "free"})
@@ -431,10 +431,15 @@ const updateUser = async (updatedUser) =>{
     };
 
 const canMakeEntry = async () => {
-   console.log('is user subbed: ', isSubscribed);
-    console.log('is user remaining free entry: ', user.remainingFreeEntries);
-
-    if(isSubscribed || user.remainingFreeEntries > 0) {return true;}
+   //console.log('is user subbed: ', isSubscribed);
+   // console.log('is user remaining free entry: ', user.remainingFreeEntries);
+    if(user) {
+          console.log('is user remaining free entry: ', user.remainingFreeEntries);
+          
+    }
+    if(isSubscribed || user.remainingFreeEntries > 0) {
+      //console.log('user free entry ', user.remainingFreeEntries )
+      return true;}
     else return false;
   }
 

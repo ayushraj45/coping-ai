@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, Dimensions, Touchable, TouchableOpacity, Button, Share, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, Touchable, TouchableOpacity, Button, Share, ScrollView, Linking, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useGlobalContext } from '../context/GlobalProvider';
-import FeedbackPrompt from '../../components/FeedbackPrompt';
-import ExternalUriModal from '../../components/ExternalUriModal';
+import { useGlobalContext } from './context/GlobalProvider';
+import FeedbackPrompt from '../components/FeedbackPrompt';
+import ExternalUriModal from '../components/ExternalUriModal';
 
 const settings = () => {
 
@@ -73,9 +73,49 @@ const settings = () => {
     )
   }
 
+  const handleRateApp = () => {
+    // iOS store ID and Android package name - you'll need to replace these
+    const iosStoreId = '6739732540';
+    const androidPackageName = 'YOUR_ANDROID_PACKAGE_NAME';
+  
+    // Store URLs
+    const storeUrls = {
+      ios: `itms-apps://itunes.apple.com/app/id${iosStoreId}?action=write-review`,
+      android: `market://details?id=${androidPackageName}`
+    };
+  
+    // Fallback URLs (if store apps aren't installed)
+    const fallbackUrls = {
+      ios: `https://apps.apple.com/app/id${iosStoreId}?action=write-review`,
+      android: `https://play.google.com/store/apps/details?id=${androidPackageName}`
+    };
+  
+    const url = Platform.select({
+      ios: storeUrls.ios,
+      android: storeUrls.android
+    });
+  
+    const fallback = Platform.select({
+      ios: fallbackUrls.ios,
+      android: fallbackUrls.android
+    });
+  
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        console.log('url here: ',url)
+        Linking.openURL(url);
+      } else {
+        Linking.openURL(fallback);
+      }
+    }).catch(err => console.error('Error opening store:', err));
+  };
+
   return (
     <SafeAreaView style={styles.main}>
       <ScrollView>
+      <TouchableOpacity onPress={()=> {router.back()}}>
+              <Ionicons name="chevron-back" size={30} color="black" />
+            </TouchableOpacity>
       <ExternalUriModal visible={showTermsPopup} onClose={() => {setShowTermsPopup(false)}} link={'https://www.coping-ai.com/terms.html'}/>   
       <ExternalUriModal visible={showTmmPopup} onClose={() => {setShowTmmPopup(false)}} link={'https://www.amazon.co.uk/Three-Minute-Mornings-Gratitude-Productivity/dp/B0D36ZC6YR/'}/>   
 
@@ -96,7 +136,7 @@ const settings = () => {
 
             <ProfileButton icon="person-outline" text="Profile" link="/profile"/>
             <ProfileButton icon="pricetag-outline" text="Subscribe" link="/subscribe" />
-            <ProfileButton icon="star-outline" text="Rate Us" />
+            <ProfileButton icon="star-outline" text="Rate Us" pressFunction={handleRateApp}/>
             {/* <ProfileButton icon="notifications-outline" text="Notifications" /> */}
             <ProfileButton icon="call-outline" text="Feedback" pressFunction={onFeedbackPress} />
             <ProfileButton icon="share-outline" text="Share" pressFunction={onShare}/>

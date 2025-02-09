@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   trialButton: {
-    backgroundColor: '#0D368C',
+    backgroundColor: '#011C2D',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

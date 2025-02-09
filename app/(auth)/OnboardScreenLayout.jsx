@@ -65,7 +65,7 @@ const OnboardScreenLayout = ({ navigation }) => {
         });
         setCurrentScreen(currentScreen + 1);
       } else {
-        router.replace('/homepage'); // Navigate to homepage after last screen
+        router.replace('/homepage2'); // Navigate to homepage after last screen
       }
     };
   

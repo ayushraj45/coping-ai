@@ -1,11 +1,13 @@
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import AuthBackground from '../../assets/icons/AuthBackground.svg'
 import AuthBG1 from '../../assets/icons/AuthBG1.svg'
 import auth from '@react-native-firebase/auth';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { useGlobalContext } from '../context/GlobalProvider';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const login = () => {
 
@@ -14,6 +16,7 @@ const login = () => {
     const [loading, setLoading] = useState(false)  
     const [errorMessage, setErrorMessage] = useState(null)
     const {login, API_URL} = useGlobalContext();
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     const signIn = async () => {
         const response = auth().signInWithEmailAndPassword(email, password)
@@ -46,7 +49,7 @@ const login = () => {
                         setLoading(false)
                         login(loggedUser)
                 router.replace({
-                    pathname: `/homepage`
+                    pathname: `/homepage2`
                 });
                 } catch(error) {
                     console.log('Error at our backend server aAuth; '+error)
@@ -91,19 +94,49 @@ const login = () => {
 
     const { width , height } = Dimensions.get('window');
 
+    useEffect(() => {
+      const keyboardDidShowListener = Keyboard.addListener(
+        'keyboardDidShow',
+        () => {
+          setKeyboardVisible(true); // Set keyboard visibility to True when keyboard is visible
+        }
+      );
+  
+      const keyboardDidHideListener = Keyboard.addListener(
+        'keyboardDidHide',
+        () => {
+          setKeyboardVisible(false);  // Set keyboard visibility to False when keyboard is not visible
+        }
+      );
+  
+      return () => {
+        keyboardDidShowListener.remove();
+        keyboardDidHideListener.remove();
+      };
+    }, []);
+  
+  
+    const renderBackground = () => {
+      if (isKeyboardVisible) {
+        return <AuthBackground width={width} height={height} />;  // Render a different background
+      } else {
+        return <AuthBG1 width={width} height={height} />; // Original background
+      }
+    };
+
     return (
         <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -64 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -10 : 0}
         >
            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>  
             <ScrollView 
                 contentContainerStyle={styles.scrollContent}
                 keyboardShouldPersistTaps="handled"
-            >
+                >
             <View style={styles.backgroundContainer}>
-                <AuthBG1 width={width} height={height}/>
+                {renderBackground()}
             </View>
                 <View style={styles.contentContainer}>
                     <View style={styles.formSection}>
@@ -129,7 +162,7 @@ const login = () => {
                                     style={styles.input}
                                     secureTextEntry={true}
                                     onChangeText={(text) => setPassword(text)}
-                                />
+                                    />
                             </View>
                             <Text style={{fontSize: RFPercentage(1), fontFamily:'cLight', color:'red'}} >
                                     {errorMessage}
@@ -159,7 +192,7 @@ const login = () => {
                             <TouchableOpacity 
                                 style={styles.registerButton}
                                  onPress={signIn}
-                                >
+                                 >
                                 <Text style={styles.registerButtonText}>
                                     Login
                                 </Text>
@@ -170,6 +203,7 @@ const login = () => {
             </ScrollView>
           </TouchableWithoutFeedback>  
         </KeyboardAvoidingView>
+
   )
 }
 
@@ -229,6 +263,7 @@ const styles = StyleSheet.create({
       
       inputContainer: {
         gap: 5,
+        zIndex: 2
       },
       
       labelText: {
@@ -264,7 +299,7 @@ const styles = StyleSheet.create({
       },
       
       loginLinkText: {
-        color: '#E2E9E2',
+        color: '#0A0A0A',
         marginTop:'15',
         alignItems: 'baseline',
         fontSize: RFPercentage(1.7),
@@ -273,7 +308,7 @@ const styles = StyleSheet.create({
       },
       
       loginText: {
-        color: '#E2E9E2',
+        color: '#0A0A0A',
         fontSize: RFPercentage(2),
         
         fontFamily:'cMedium',
@@ -283,7 +318,7 @@ const styles = StyleSheet.create({
       registerButton: {
         borderRadius: 10,
         borderWidth: 2,
-        borderColor: '#E2E9E2',
+        borderColor: '#0A0A0A',
         paddingHorizontal: 20,
         paddingVertical: 12,
       },
@@ -291,6 +326,6 @@ const styles = StyleSheet.create({
       registerButtonText: {
         fontSize: RFPercentage(2.3),
         fontFamily: 'bSemi',
-        color:'#E2E9E2'
+        color:'#0A0A0A'
       },
 })
