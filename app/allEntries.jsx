@@ -69,7 +69,7 @@ const { width, height } = Dimensions.get('window');
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={() => (
-            <Text>No entries found.</Text>
+            <Text style={{textAlign:'center', verticalAlign:'middle', fontFamily:'bSemi', marginTop:height*0.50}}>No entries found.</Text>
           )}
           contentContainerStyle={{
             paddingBottom: 130,

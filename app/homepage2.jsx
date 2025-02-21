@@ -66,7 +66,7 @@ const homepage2 = () => {
           </View>
           <View style={styles.midSection}>
             <View style={{alignSelf:'center'}}>
-                <Text style={{fontSize: RFPercentage(3.3), fontFamily:'bSemi'}}>Hello, {username} </Text>
+                <Text style={{fontSize: RFPercentage(3.3), fontFamily:'bSemi'}}>Hello, {username}</Text>
             </View>
             <TouchableOpacity onPress={handleOpenSheet}>
                 <View style={styles.promptBtn}> 
