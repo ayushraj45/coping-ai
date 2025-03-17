@@ -27,9 +27,7 @@ const notificationListener = useRef();
 const responseListener = useRef();
 
 
-// useEffect(() => {
-//   console.log('user in USEeffect on GC', user)
-// },[user])
+
 
 useEffect(() => {
     const subscriber = auth().onAuthStateChanged(async (authUser) => {
@@ -160,6 +158,37 @@ const checkSubscriptionStatus = (customerInfo) => {
   }
 }
 
+const restoreUserPurchase = async () => {
+  try {
+    const restore = await Purchases.restorePurchases();
+    console.log(restore)  
+    console.log(restore.activeSubscriptions)
+    if (restore.activeSubscriptions.includes("pro_month")) {
+      updateUserSubscriptionStatus('Pro Monthly')
+      setUser({
+        ...user,
+        subscriptionStatus: 'Pro Monthly'
+      })
+      setIsSubscribed(true)
+      return true;
+  }
+  else if (restore.activeSubscriptions.includes("pro_annual")) {
+    updateUserSubscriptionStatus('Pro Annual')
+      setIsSubscribed(true)
+      setUser({
+        ...user,
+        subscriptionStatus: 'Pro Annual'
+      })
+    return true;
+  }
+  else {updateUserSubscriptionStatus('free')
+    setIsSubscribed(false)
+  return false;}
+  } catch (e) {
+      console.log(e) 
+  }
+}
+
 const login = async (userData) => {
     
   setIsLoading(true)
@@ -182,26 +211,29 @@ const login = async (userData) => {
     };
 
     const logout = async () => {
-        try {
-          setIsLoggedIn(false);
-          await AsyncStorage.removeItem('user');
-          await AsyncStorage.removeItem('isLoggedIn');
-          await auth().signOut();
-          setIsLoading(true)
-          setUser(null);  
-        } catch (error) {
-          console.error('Error removing login data', error);
-        }finally{
-          if(user){
-           // console.log('user exists after logging off ', user)
-          }
-          (setIsLoading(false));
-        }
+      try {
+        setIsLoggedIn(false);
+        await AsyncStorage.removeItem('user');
+        await AsyncStorage.removeItem('isLoggedIn');
+        await auth().signOut();
+        setIsLoading(true);
+        setUser(null);  
+        console.log('logout did happen too');
+        return true; 
+    } catch (error) {
+        console.error('Error removing login data', error);
+        return false; 
+    } finally {
+        setIsLoading(false);
+    }
       };
 
     const settingTheUser = (user) => {
         setUser(user)
         setIsLoading(false)
+        if(user.subscriptionStatus !== "free"){
+          setIsSubscribed(true)
+        }
       }
 
       useEffect(() => {
@@ -226,8 +258,10 @@ const login = async (userData) => {
 
 const updateUserSubscriptionStatus = async (subscriptionPlan) => {
  // console.log('we came here at update sub status! ')
-  await updateUser({...user, "subscriptionStatus": subscriptionPlan});
-    
+  await updateUser({...user, subscriptionStatus: subscriptionPlan});
+  if(subscriptionPlan !== 'free') {
+    console.log('setting is subscribed');
+    setIsSubscribed(true)}  else {setIsSubscribed(false)}
 }
 
 const refreshAll = useCallback(async () => {
@@ -288,7 +322,7 @@ const getAll = async (userid) => {
 }
 
 const addEntry = async (entry) => {
-    //console.log('entry to be added ', entry)
+
     try {
           const response = await fetch(API_URL + 'entry', {
               method: 'POST',
@@ -298,14 +332,9 @@ const addEntry = async (entry) => {
               body: JSON.stringify(entry),
           });
           const data = await response.json();
-         // console.log('added entry data in GC ', data);
-          //console.log(entries.length); //remove
-
-        
-          //setEntries([...prev, data]);
-          //onsole.log('Successfully added entry with ID at ADD Entry ' + data.id);
           return data.id;
       } catch (error) {
+
           return console.error('Error in add all: ' + error);
       }
   };
@@ -314,9 +343,41 @@ const addEntry = async (entry) => {
     return fetch(API_URL + 'entry/user/' + user.id + '/' + entryId + '/', {method: 'DELETE'})
         .then(async () => {
           //console.log(entryId + " deleted");
-          await refreshAll();
+          await refreshEntries();
           return true;})
         .catch(error => console.error('Error deleting ' + entryId + ': ', error));
+  };
+
+  const deleteUser = async (id) => {
+
+    const userId = id || user.id; // Assuming you have user data in your state
+    
+    try {
+      const response = await fetch(API_URL + 'users/' + userId, {
+        method: 'DELETE'
+        });
+      
+      if (response.status === 204 || response.status === 200) {
+       console.log('user got deleted')
+        const userFirebase = auth().currentUser; // Get the current Firebase user
+    
+            if (!userFirebase) {
+              console.log('No authenticated user found');
+              return false;
+            }
+            await userFirebase.delete().then(console.log('user deleted from firebase'), logout());
+            console.log('Firebase Auth user deleted successfully');
+        return true;
+      } else {
+        console.log('Failed to delete user. Status:', response.status);
+        return false;
+      }
+    } catch (error) {
+      console.log('Error deleting user ' + userId + ': ', error);
+      return false;
+    }
+
+    
   };
 
   const updateEntry = async (entry) => {
@@ -424,24 +485,30 @@ const updateUser = async (updatedUser) =>{
             const data = await response.json();
             //console.log('Successfully updated ' + data.id);
             login(data);
+            setUser(data);
             return data;
         } catch (error) {
             return console.error('Error updating: ' + error);
         }
     };
 
-const canMakeEntry = async () => {
-   //console.log('is user subbed: ', isSubscribed);
-   // console.log('is user remaining free entry: ', user.remainingFreeEntries);
-    if(user) {
-          console.log('is user remaining free entry: ', user.remainingFreeEntries);
-          
+    const canMakeEntry = async () => {
+      if (user) {
+        console.log('is subsribed', isSubscribed)
+        if (!isSubscribed) {console.log('did we come here')
+          const userToCheck = await getUserById(user.id);
+          console.log('users remaining free entries ', userToCheck.remainingFreeEntries);
+          if (userToCheck.remainingFreeEntries > 0) return true;
+        }
+        return true;
+      }
+      else return false;
     }
-    if(isSubscribed || user.remainingFreeEntries > 0) {
-      //console.log('user free entry ', user.remainingFreeEntries )
-      return true;}
-    else return false;
-  }
+
+  // useEffect(() => {
+  //   // This will run whenever user.remainingFreeEntries changes
+  //   if(user) {console.log('Remaining free entries:', user.remainingFreeEntries);}
+  // }, [user.remainingFreeEntries]);
 
     const addFeedback = async (feedback) => {
       //console.log(feedback)
@@ -462,7 +529,7 @@ const canMakeEntry = async () => {
     };
 
     return(
-        <GlobalContext.Provider value={{ fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{ fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, restoreUserPurchase, deleteUser, setIsSubscribed, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

@@ -1,11 +1,11 @@
-import { Dimensions, StyleSheet, Text, View , TouchableOpacity,} from 'react-native'
+import { Dimensions, StyleSheet, Text, View , TouchableOpacity, Alert,} from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import GradiBackground from '../../components/GradiBackground';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileLogo from '../../assets/icons/ProfileLogo';
 import { Ionicons } from '@expo/vector-icons';
 import { RFPercentage } from 'react-native-responsive-fontsize';
-import { router, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useGlobalContext } from '../context/GlobalProvider';
 
 const profile = () => {
@@ -18,10 +18,11 @@ const profile = () => {
   const [value, setValue] = useState(2);
   const [tempValue, setTempValue] = useState(2);
   const [subscriptionStatus, setSubscriptionStatus] = useState('');
-  const { user , isLoggedIn, updateUser, entriesLength, refreshUserData,getUserById, logout} = useGlobalContext();
+  const { user , isLoggedIn, updateUser, restoreUserPurchase, deleteUser ,getUserById, logout} = useGlobalContext();
   const [isLoading, setIsLoading] =useState(false)
   const [currentEntryLength, setCurrentEntryLength] = useState(`${value}`);
-
+  const [purchaseRestoreText, setPurchaseRestoreText] =useState('');
+  const router = useRouter();
 
 const handleEdit = useCallback(() => {
   setEnableEdit(prevState => !prevState);
@@ -77,6 +78,13 @@ useEffect(() => {
   setUpProfile();
 }, []);
 
+const retorePurchase = async () => {
+  const purchase =await restoreUserPurchase();
+  if(purchase){
+    setPurchaseRestoreText('Your previous purchase is restored.');
+  }
+  else setPurchaseRestoreText('No previous purchase found');
+}
 
 const daysSinceLastReset = (updatedAt) => {
   const msPerDay = 1000 * 60 * 60 * 24;
@@ -102,6 +110,44 @@ const decrement = () => {
   }
 };
 
+const onDeletePress = () => {
+  Alert.alert(
+    'Delete Account?',
+    'This will delete your account and all your entries. You will not be able to log in with the same email id again.',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+       
+      },
+      {
+        text: 'Proceed', 
+        onPress: async () => { const gotDeleted = await deleteUser(user.id); 
+         if(gotDeleted){
+          router.dismissAll();
+            setTimeout(() => {
+              router.replace('/(auth)/login');
+            }, 100); 
+         }
+        }
+      }
+    ]
+  );
+
+};
+
+const handleLogout = async () => {
+  const isLoggedOut = await logout();
+
+  if (isLoggedOut) {
+    router.dismissAll();
+    setTimeout(() => {
+      router.replace('/(auth)/login');
+    }, 100);
+  } else {
+    console.error("Logout failed, staying on the current screen.");
+  }
+}
 
 return (   
     <SafeAreaView style={{
@@ -154,6 +200,11 @@ return (
       </View>
       </View>
       <View style={styles.infoRow}>
+        <TouchableOpacity onPress={onDeletePress}>
+        <Text style={{fontSize: RFPercentage(2)}}>Delete Account</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.infoRow}>
         <View style={!enableEdit ? styles.button : styles.cancelbutton}>
         <TouchableOpacity onPress={handleEdit}>
           {!enableEdit ? <Text style={{fontSize: RFPercentage(2)}} className="font-bSemi"> Edit </Text> : <Text style={{fontSize: RFPercentage(2)}} className="font-bSemi"> Cancel </Text>  }
@@ -168,13 +219,25 @@ return (
 
       </View>
       <View style={styles.infoRow}>
-      <TouchableOpacity onPress={() => { logout();  router.replace("/login")}}>
+      <TouchableOpacity onPress={()=>{handleLogout()}}>
             <View style={styles.pageButton}>
             <Ionicons name="log-out-outline" size={30} color="black" />
             <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>Logout</Text>
             </View>
-            </TouchableOpacity>         
+            </TouchableOpacity>  
+
+                  
       </View>
+      
+      <View style={styles.infoRow_bottom}>
+          <TouchableOpacity onPress={() => { retorePurchase()}}>
+            <View style={styles.pageButton}>
+            <Ionicons name="timer-outline" size={30} color="black" />
+            <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>Restore Previous Purchase</Text>
+            </View>
+            </TouchableOpacity>   
+      </View>
+      <Text style={{padding:5, marginHorizontal:15, fontFamily:'cLight', fontSize:RFPercentage(2), color:'red', textAlign:'center'}}>{purchaseRestoreText}</Text>
     </SafeAreaView>  
 
 )}
@@ -210,6 +273,13 @@ padding:5,
     justifyContent:'space-between',
     marginHorizontal:15,
     marginTop:15,
+  },
+  infoRow_bottom:{
+    flexDirection:'row',
+    alignItems:'baseline',
+    padding:5,
+    justifyContent:'space-between',
+    marginHorizontal:15,
   },
   stepperContainer: {
     flexDirection: 'row',

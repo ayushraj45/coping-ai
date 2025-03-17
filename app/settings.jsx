@@ -24,7 +24,7 @@ const settings = () => {
     try {
       const result = await Share.share({
         message:
-          ' Finally, a journaling app that makes getting your thoughts out feel natural.  Turns messy thoughts into meaningful insights so no more staring at blank pages! 🎯 Try Coping.ai download here: #link here in the future'
+          ' Finally, a journaling app that makes getting your thoughts out feel natural.  Turns messy thoughts into meaningful insights so no more staring at blank pages! 🎯 Try Coping.ai download here: https://apps.apple.com/gb/app/id6739732540'
 
         
       });

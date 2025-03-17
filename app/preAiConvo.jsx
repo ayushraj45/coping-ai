@@ -15,7 +15,7 @@ const preAiConvo = () => {
      const [userId, setUserId] = useState(null);
      const [isLoading, setIsloading] = useState(false)
      const router = useRouter();
-     const {getGPTResponse, user, refreshEntries, addEntry,getGPTInstaPrompt} = useGlobalContext();
+     const {getGPTResponse, user, setFreeEntries, addEntry,getGPTInstaPrompt} = useGlobalContext();
 
     useEffect(() => {
     if(user){
@@ -54,6 +54,7 @@ const preAiConvo = () => {
         const newEntryId = await addEntry(initialEntry); //add from GC
 
         if(newEntryId) {
+
             if(params.id === '3') {
               try{
                 const data = await getGPTInstaPrompt(newEntryId, prompt); //add from GC

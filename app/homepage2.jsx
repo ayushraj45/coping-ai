@@ -39,16 +39,15 @@ const homepage2 = () => {
       }, [user]);
 
 
+
     const handleOpenSheet = useCallback( async () => {
         const allowEntry = await canMakeEntry();
         console.log('can make entry here: ',allowEntry)
 
-        if(await canMakeEntry()) {setAllowEntry(true)} else setAllowEntry(false)
         if(allowEntry){
-            setIsSheetOpen(true);
-            setIndex(0);
-            bottomSheetRef?.current?.expand();
-            console.log(bottomSheetRef)
+           setTimeout(() => {
+      bottomSheetRef?.current?.expand();
+    }, 100);
             setAllowEntry(false);
         }
         else{
@@ -106,9 +105,9 @@ const homepage2 = () => {
         >
           <BottomSheetView style={styles.contentContainer}>
           <EntryChoice number={1} title={'Mood'} content={'Start with how you are feeling'} color={'#FFD788'}/>
-          <EntryChoice number={2} title={'Event'} content={'Start with how you are feeling'} color={'#FF8C88'}/>
-          <EntryChoice number={3} title={'Explore'} content={'Start with how you are feeling'} color={'#BBD8FF'}/>
-          <EntryChoice number={4} title={'Today'} content={'Start with how you are feeling'} color={'#FFB778'}/>
+          <EntryChoice number={2} title={'Event'} content={'Something on your mind? Share away'} color={'#FF8C88'}/>
+          <EntryChoice number={3} title={'Explore'} content={'Choose a theme and explore your thoughts with Instant Prompts'} color={'#BBD8FF'}/>
+          <EntryChoice number={4} title={'Today'} content={'Plan, reflect or vent (and more) about your day'} color={'#FFB778'}/>
 
           {/* <ScrollView>
                     <EntryChoice number={1} title={'Mood'} content={'Start with how you are feeling'} color={'#FFD788'}/>

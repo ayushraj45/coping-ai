@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'coping-ai'
+rootProject.name = 'Coping-ai'
 
 dependencyResolutionManagement {
   versionCatalogs {

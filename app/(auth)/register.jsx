@@ -39,6 +39,9 @@ const register = () => {
                     if (error.code === 'auth/user-not-found') {
                         setErrorMessage('User not found! Please register to get started!');
                     }
+                    if (error.code === 'auth/weak-password') {
+                      setErrorMessage('Weak password! Please use at least 6 digits');
+                  }
                     console.error(error);
                 });
                 console.log('create acc success '+ response);

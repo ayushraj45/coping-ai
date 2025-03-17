@@ -34,6 +34,9 @@ const login = () => {
             if (error.code === 'auth/user-not-found') {
                 setErrorMessage('User not found! Please register to get started!');
             }
+            if (error.code === 'auth/invalid-credential') {
+              setErrorMessage('Invalid Credentials! Please register to get started!');
+          }
             console.error(error);
         });
         console.log('create acc success '+ response);
@@ -53,6 +56,7 @@ const login = () => {
                 });
                 } catch(error) {
                     console.log('Error at our backend server aAuth; '+error)
+                    setErrorMessage('Something went wrong, please try again or contact us')
                 }
             }    
         }
@@ -86,9 +90,13 @@ const login = () => {
                 } else {
                   const errorMessage = await response.text();
                   console.error("Error from backend:", errorMessage);
+                  setErrorMessage('Something went wrong, please try again or contact us')
+
                 }
               } catch (error) {
                 console.error("Error sending token to backend:", error);
+                setErrorMessage('Something went wrong, please try again or contact us')
+
               }
        }
 

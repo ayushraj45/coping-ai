@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Purchases, { PurchasesOffering } from 'react-native-purchases';
 import { useGlobalContext } from '../app/context/GlobalProvider';
+import RotatingLogoLoader from './RotatingLogoLoader';
 
 
 const PricingOption = ({ identifier, title, description, isSelected, onSelect, isBestValue,perweek, price, packageType }) => (
@@ -9,7 +10,7 @@ const PricingOption = ({ identifier, title, description, isSelected, onSelect, i
       style={[styles.pricingOption, isSelected && styles.selectedOption]}
       onPress={onSelect}
     >
-      <Text style={styles.optionTitle}>{price} </Text> 
+      {title === 'Coping Pro Annual' ? <Text style={styles.optionTitle}>{price} / Per Year </Text> : <Text style={styles.optionTitle}>{price} / Per Month </Text>} 
       <Text style={styles.perweek}>{perweek} / Per Week </Text>
       <Text style={styles.optionDescription}>{title}</Text>
       <Text style={styles.optionDescription}>{description}</Text>
@@ -22,28 +23,49 @@ const PricingPanel = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [products, setProducts] = useState([]);
   const { updateUserSubscriptionStatus } = useGlobalContext();
+  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
-      const productSetup = async ()=> {
-       await fetchProducts();
-        console.log('products: ' + JSON.stringify(products))
+    console.log('Current products:', products);
+  }, [products]);
+
+
+  useEffect(() => {
+
+    const productSetup = async () => {
+      try {
+        const result = await fetchProducts();
+        if (result) {  // Only set isLoading false if we successfully got products
+          setIsLoading(false);
+          console.log('current offering log ' + products) 
+
+        }
+      } catch (error) {
+        console.error('Error in product setup:', error);
       }
-
+    };
+    
+    if (products.length === 0) {
       productSetup();
-     
-    },[]);
-
+    }
+  }, []); 
+  
   const fetchProducts = async () => {
     try {
       const offerings = await Purchases.getOfferings();
       const currentOffering = offerings.current;
-      if(currentOffering) {
-        setProducts(currentOffering.availablePackages)
-        console.log('current offering log ' + products) 
+      if (currentOffering && currentOffering.availablePackages.length > 0) {
+        setProducts(currentOffering.availablePackages);
+
+        return true;
       }
-      return 'the offerings are empty';
+      setTimeout(() => fetchProducts(), 1000);
+      return false;
     } catch (error) {
       console.error('Error fetching products:', error);
+      setTimeout(() => fetchProducts(), 1000);
+      return false;
     }
   };
 
@@ -109,11 +131,12 @@ const PricingPanel = () => {
 
   const onPurchase = async (pack) => {
 		// Purchase the package
+    setIsLoading(true)
     try{
-      await Purchases.purchasePackage(pack);
+      await Purchases.purchasePackage(pack).then(()=>{setIsLoading(false)});
 
       if(pack.product.identifier === 'pro_month'){
-        console.log('monthly log works; ', pack.product.identifier)
+        //console.log('monthly log works; ', pack.product.identifier)
         updateUserSubscriptionStatus('Pro Monthly')
       }
       else if(pack.product.identifier === 'pro_annual'){
@@ -121,12 +144,14 @@ const PricingPanel = () => {
       }else{}
     }catch (e){
         console.log(e)
+        setIsLoading(false);
+
     }
 	};
 
   return (
     <View style={styles.container}>
-
+      <RotatingLogoLoader isLoading={isLoading}/>
       <Text style={{fontFamily:'bSemi', fontSize:15, color:'red'}}> INTRODUCTORY OFFER: ALL PRICES ARE 50% OFF!</Text>
 
 				{products.map((pack) => (
@@ -142,9 +167,9 @@ const PricingPanel = () => {
           />
 				))}
 		
-      <TouchableOpacity style={styles.trialButton} onPress={onPurchasePress}>
+      {/* <TouchableOpacity style={styles.trialButton} onPress={onPurchasePress}>
         <Text style={styles.trialButtonText}>Remove All Limits</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Text style={styles.termsText}>
         By placing this order, you agree to the Terms of Service and Privacy Policy. Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.
       </Text>
