@@ -95,11 +95,6 @@ android {
         versionName "1.0.0"
     }
 
-    kotlinOptions {
-        suppressKotlinVersionCompatibilityCheck = true
-    }
-
-
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
