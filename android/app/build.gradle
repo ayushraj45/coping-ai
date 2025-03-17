@@ -86,6 +86,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+
     namespace 'com.ayushrajp.copingai'
     defaultConfig {
         applicationId 'com.ayushrajp.copingai'
@@ -102,6 +103,14 @@ android {
             keyPassword 'android'
         }
     }
+    composeOptions {
+        def versionsMap = [
+            "1.9.24": "1.5.14",
+            "1.9.25": "1.5.15",
+        ]
+    kotlinCompilerExtensionVersion = versionsMap["1.9.25"]
+    }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
