@@ -36,6 +36,9 @@
             "ios": {
               "useFrameworks": "static",
               "flipper": true
+            },
+            "android": {
+              "kotlinVersion": "1.9.24"
             }
           }
         ], 
