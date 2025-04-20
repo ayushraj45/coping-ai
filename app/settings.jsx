@@ -21,13 +21,17 @@ const settings = () => {
   }
 
   const onShare = async () => {
-    try {
-      const result = await Share.share({
-        message:
-          ' Finally, a journaling app that makes getting your thoughts out feel natural.  Turns messy thoughts into meaningful insights so no more staring at blank pages! 🎯 Try Coping.ai download here: https://apps.apple.com/gb/app/id6739732540'
 
-        
-      });
+    const appStoreLink = "https://apps.apple.com/gb/app/id6739732540";
+    const playStoreLink = "https://play.google.com/store/apps/details?id=com.ayushrajp.copingai";
+
+    try {
+      if(Platform.OS === 'ios') {
+
+      }
+      const result = await Share.share({
+        message: `Finally, a journaling app that makes getting your thoughts out feel natural. Turns messy thoughts into meaningful insights so no more staring at blank pages! 🎯 Try Coping.ai download here: ${Platform.OS === 'ios' ? appStoreLink : playStoreLink}`
+      });;
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
           // shared with activity type of result.activityType
@@ -76,12 +80,12 @@ const settings = () => {
   const handleRateApp = () => {
     // iOS store ID and Android package name - you'll need to replace these
     const iosStoreId = '6739732540';
-    const androidPackageName = 'YOUR_ANDROID_PACKAGE_NAME';
+    const androidPackageName = 'com.ayushrajp.copingai';
   
     // Store URLs
     const storeUrls = {
       ios: `itms-apps://itunes.apple.com/app/id${iosStoreId}?action=write-review`,
-      android: `market://details?id=${androidPackageName}`
+      android: `https://play.google.com/store/apps/details?id=${androidPackageName}`
     };
   
     // Fallback URLs (if store apps aren't installed)

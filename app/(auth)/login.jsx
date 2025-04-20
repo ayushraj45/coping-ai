@@ -8,6 +8,7 @@ import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { useGlobalContext } from '../context/GlobalProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StatusBar } from 'expo-status-bar';
 
 const login = () => {
 
@@ -100,7 +101,7 @@ const login = () => {
               }
        }
 
-    const { width , height } = Dimensions.get('window');
+    const { width , height } = Dimensions.get('screen');
 
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener(

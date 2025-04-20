@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
+import { StatusBar } from 'expo-status-bar';
 
 const login = () => {
 
@@ -31,7 +32,7 @@ const login = () => {
         });
     }
 
-    const { width , height } = Dimensions.get('window');
+    const { width , height } = Dimensions.get('screen');
 
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener(
@@ -69,6 +70,7 @@ const login = () => {
         style={styles.container}
         keyboardVerticalOffset={Platform.OS === 'ios' ? -10 : 0}
         >
+          <StatusBar style="light" translucent={true} backgroundColor="transparent" /> 
            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>  
             <ScrollView 
                 contentContainerStyle={styles.scrollContent}

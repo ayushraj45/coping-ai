@@ -9,6 +9,7 @@ import { Redirect, router } from 'expo-router'
 // import FPBGGraphic from '../../assets/icons/FPBGGraphic'
 // import RegisterBG from '../../assets/icons/RegisterBg'
 import GetStartedBG from '../../assets/icons/GetStartedBG.svg'
+import { StatusBar } from 'expo-status-bar'
 
 // import AuthBackground from '../../assets/icons/AuthBackground'
 
@@ -18,7 +19,8 @@ const getStarted = () => {
 
   // const {isLoading, isLoggedIn} = useGlobalContext();
 
-  const { width , height } = Dimensions.get('window');
+  //const { width , height } = Dimensions.get('window');
+  const {width, height} = Dimensions.get('screen');
 
   // if (!isLoading && isLoggedIn) return <Redirect href="/homepage" />;
 
@@ -53,6 +55,7 @@ const getUserById = async (id) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="light" translucent={true} backgroundColor="transparent" /> 
       {/* Background Container */}
       <View style={styles.backgroundContainer}>
         <GetStartedBG width={width} height={height} />

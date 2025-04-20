@@ -119,7 +119,7 @@ useEffect(() => {
   
     try{
     if (Platform.OS == "android") {      
-      await Purchases.configure({ apiKey: 'googleAPIhere' });
+      await Purchases.configure({ apiKey: 'goog_zUrqBFXJKfUtxZkULsVphkEcUCu'});
     } else {
       await Purchases.configure({ apiKey:'appl_bKjBvIBLemkBPibcJuXbCyMAzvi'});
     }
@@ -499,6 +499,7 @@ const updateUser = async (updatedUser) =>{
           const userToCheck = await getUserById(user.id);
           console.log('users remaining free entries ', userToCheck.remainingFreeEntries);
           if (userToCheck.remainingFreeEntries > 0) return true;
+          else { console.log ('we in here now for false');  return false;}
         }
         return true;
       }

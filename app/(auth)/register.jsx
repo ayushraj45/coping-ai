@@ -7,6 +7,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { useGlobalContext } from '../context/GlobalProvider';
+import { StatusBar } from 'expo-status-bar';
 
 const register = () => {
 
@@ -17,7 +18,7 @@ const register = () => {
     const {login, API_URL, expoPushToken} = useGlobalContext();
     const [errorMessage, setErrorMessage] = useState(null)
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-    const { width , height } = Dimensions.get('window');
+    const { width , height } = Dimensions.get('screen');
 
     const signUp = async () => {
         setLoading(true)

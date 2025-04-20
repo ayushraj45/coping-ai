@@ -122,7 +122,7 @@ const handleApiUpdate = async () => {
       style={{ flex: 1 }}
       >
          
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1,  marginTop: Platform.OS === 'ios' ? 0 : 20,} }>
             <TouchableOpacity onPress={()=> {router.back()}}>
               <Ionicons name="chevron-back" size={24} color="black" />
             </TouchableOpacity>

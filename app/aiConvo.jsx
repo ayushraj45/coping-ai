@@ -86,7 +86,7 @@ const aiConvo = () => {
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardAvoid}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 20}
           >
           <TouchableOpacity onPress={() => {
               Alert.alert(

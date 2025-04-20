@@ -15,7 +15,7 @@ const allEntries = () => {
   const [filteredEntries, setFilteredEntries] = useState(entries);
   const [refreshing, setRefreshing] = useState(false);
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 
   const fetchEntries = async () => {

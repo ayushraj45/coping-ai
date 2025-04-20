@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, View , TouchableOpacity, Alert,} from 'react-native'
+import { Dimensions, StyleSheet, Text, View , TouchableOpacity, Alert, Platform,} from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import GradiBackground from '../../components/GradiBackground';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -229,14 +229,16 @@ return (
                   
       </View>
       
-      <View style={styles.infoRow_bottom}>
+      {Platform.OS === 'ios' ?       <View style={styles.infoRow_bottom}>
           <TouchableOpacity onPress={() => { retorePurchase()}}>
             <View style={styles.pageButton}>
             <Ionicons name="timer-outline" size={30} color="black" />
             <Text style={{fontSize: RFPercentage(3), fontFamily: 'bMedium'}}>Restore Previous Purchase</Text>
             </View>
             </TouchableOpacity>   
-      </View>
+      </View> :
+      <View/>}
+
       <Text style={{padding:5, marginHorizontal:15, fontFamily:'cLight', fontSize:RFPercentage(2), color:'red', textAlign:'center'}}>{purchaseRestoreText}</Text>
     </SafeAreaView>  
 

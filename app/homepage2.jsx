@@ -14,7 +14,7 @@ import preAiConvo from './preAiConvo';
 import { useGlobalContext } from './context/GlobalProvider';
 import SubscribePrompt from '../components/SubscribePrompt';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 const homepage2 = () => {
     const bottomSheetRef = useRef(null);
@@ -58,8 +58,9 @@ const homepage2 = () => {
     // renders
     return (
       <GestureHandlerRootView style={styles.container}>
-        <SubscribePrompt visible={showSubsribeNotice} onClose={() => {setShowSubscribeNotice(false)}} text={"You have reached your weekly limit of free entries. Please subscribe to enjoy unlimited entries and more!"}/>
         <View style={styles.main}>
+        <SubscribePrompt visible={showSubsribeNotice} onClose={() => {setShowSubscribeNotice(false)}} text={"You have reached your weekly limit of free entries. Please subscribe to enjoy unlimited entries and more!"}/>
+{/* android change */}
           <View style={styles.topGraphic}>
             <HomepageTop width={width} height={height * 0.20} />
           </View>

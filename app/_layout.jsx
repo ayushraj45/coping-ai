@@ -5,6 +5,7 @@ import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import GlobalProvider from "./context/GlobalProvider"
 import * as Notifications from "expo-notifications";
+import { StatusBar } from 'expo-status-bar';
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
@@ -42,7 +43,8 @@ const RootLayout = () => {
   });
 
   return (
-   
+   <>
+  <StatusBar hidden={true} /> 
     <GlobalProvider>
       <Stack initialRouteName= "index">
         <Stack.Screen name="index" options={{headerShown: false}}/>
@@ -61,6 +63,7 @@ const RootLayout = () => {
 
       </Stack>
     </GlobalProvider>
+    </>
   );
 }
 
