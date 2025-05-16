@@ -15,7 +15,7 @@ const preAiConvo = () => {
      const [userId, setUserId] = useState(null);
      const [isLoading, setIsloading] = useState(false)
      const router = useRouter();
-     const {getGPTResponse, user, setFreeEntries, addEntry,getGPTInstaPrompt} = useGlobalContext();
+     const {getGPTResponse, user, setFreeEntries, addEntry,getGPTInstaPrompt,createEmotionalPlan} = useGlobalContext();
 
     useEffect(() => {
     if(user){
@@ -23,6 +23,25 @@ const preAiConvo = () => {
         setUserId(user.id);     
     }
     }, [user]);  
+   
+  const handleButtonPress = async (prompt,text) => {
+    if(params.id === '5'){
+       try {
+              
+              const planId = await createEmotionalPlan(prompt);
+              if (planId) {
+                  console.log('Plan created with ID:', planId);
+                  router.push({ pathname: `/plan/${planId}`, params: { planId: planId } });
+                 
+              } else {
+                  console.log('Failed to create plan: API did not return a valid ID.');
+              }
+          } catch (error) {
+              console.error('Error creating plan:', error);
+          }
+    }
+    else handleEmotionPress(prompt,text);
+  }  
 
     const getCurrentDateTime = () => {
     const now = new Date();
@@ -99,6 +118,11 @@ const preAiConvo = () => {
             return theme;
           case 4:
             return days;
+          case 5:
+            return paths;
+          case 6:
+            return events;  
+          
           default:
             return days; // Return an empty array instead of null
         }
@@ -114,6 +138,10 @@ const preAiConvo = () => {
             return 'Choose a theme and start with a prompt instantly!';
           case 4:
             return 'Get more in touch with your thoughts through the day';
+          case 5:
+            return 'Choose a path to start the program';  
+          case 6:
+            return 'Start a conversation and let AI make your entry';  
           default:
             return 'Start with anything'; // Return an empty array instead of null
         }
@@ -156,10 +184,24 @@ const preAiConvo = () => {
         { id: '15', text: 'Content', color: '#F4C2C2', prompt: 'I feel content' },
        
       ]; 
-      
+      const paths = [
+        { id: '1', text: 'Purpose', color: '#FFD88D', prompt: 'Purpose and Fulfillment' },
+        { id: '2', text: 'Stress', color: '#FFD88D' , prompt: 'Stress & Burnout'},
+        { id: '3', text: 'Self-esteem', color: '#FFD88D', prompt: 'Self-esteem / Self-talk' },
+        { id: '4', text: 'Relationships', color: '#FFD88D' ,prompt: 'Relationships / Social Life' },
+        { id: '5', text: 'Sleep', color: '#FFD88D', prompt: 'Sleep / Energy' },
+        { id: '6', text: 'Energy', color: '#FFD88D' , prompt: 'Sleep / Energy'},
+        { id: '1', text: 'Fulfillment', color: '#FFD88D', prompt: 'Purpose and Fulfillment' },
+        { id: '1', text: 'Burnout', color: '#FFD88D', prompt: 'Stress & Burnout' },
+        { id: '1', text: 'Self-talk', color: '#FFD88D', prompt: 'Self-esteem / Self-talk' },
+        { id: '1', text: 'Emotional Regulation', color: '#FFD88D', prompt: 'Emotional Regulation' },
+        { id: '1', text: 'Social Life', color: '#FFD88D', prompt: 'Relationships / Social Life' },
+
+
+    ]      
     const OptionButton = ({text, color, prompt}) => {
         return (
-           <TouchableOpacity onPress={() => {handleEmotionPress(prompt, text)}}>
+           <TouchableOpacity onPress={() => {handleButtonPress(prompt, text)}}>
                 <View style={[{backgroundColor:color}, styles.optionButton]}>
                     <Text style={{ fontSize: RFPercentage(2), fontFamily:'cMedium'}}>
                     {text}
@@ -199,6 +241,7 @@ const preAiConvo = () => {
                 numColumns={3}
                 columnWrapperStyle={styles.columnWrapper}
             />
+            {params.id === "5" ? <View/> : 
             <TextInput
                 style={{
                     marginVertical: RFPercentage(1),
@@ -217,7 +260,8 @@ const preAiConvo = () => {
                     const text = event.nativeEvent.text;
                     handleEmotionPress(text);
                 }}    
-            />       
+            />      
+            } 
           </KeyboardAvoidingView>
         </SafeAreaView>
     </GestureHandlerRootView> 

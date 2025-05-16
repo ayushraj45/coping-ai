@@ -6,7 +6,7 @@ import { RFPercentage } from 'react-native-responsive-fontsize';
 import { useRouter } from 'expo-router';
 import { useGlobalContext } from '../app/context/GlobalProvider';
 
-const JournalEntryPane = ({title, content, id}) => {
+const JournalEntryPane = ({title, content, id, del, type}) => {
   //console.log(id)
   const router = useRouter();
 //  const { deleteEntry , refreshUserData} = useGlobalContext();
@@ -14,12 +14,28 @@ const JournalEntryPane = ({title, content, id}) => {
 
 
   const handlePress = () => {
-    console.log('Pressed entry with ID:', id);
-    router.push({
-      pathname: `/entry/[id]`,
-      params: { id: id }
-    });
-  };
+    if(type === 'assessment'){
+      console.log('Pressed entry with ID:', id);
+      router.push({
+        pathname: `/assessment/[id]`,
+        params: { id: id }
+      });
+    }
+    else if (type === 'plan'){
+      console.log('Pressed entry with ID:', id);
+      router.push({
+        pathname: `/plan/[id]`,
+        params: { id: id }
+      });
+    }
+    else {
+      console.log('Pressed entry with ID:', id);
+      router.push({
+        pathname: `/entry/[id]`,
+        params: { id: id }
+      });
+    };
+  }
 
   const handleDeletePress = async () => {
     console.log('delete clicked')
@@ -40,12 +56,14 @@ const JournalEntryPane = ({title, content, id}) => {
         <View style={styles.logoContainer}>
             <SmallLogo/>
         </View>
-        
-        <View style={styles.actionIconContainer}>
-          <TouchableOpacity onPress={() => handleDeletePress()}>
-            <Ionicons name="trash-outline" size={24} color="grey" />
-          </TouchableOpacity>
-        </View>
+        {(del) ?         <View style={styles.actionIconContainer}>
+        <TouchableOpacity onPress={() => handleDeletePress()}>
+          <Ionicons name="trash-outline" size={24} color="grey" />
+        </TouchableOpacity>
+      </View> :
+      <></>
+        }
+
       </View>
     </View>
   </TouchableOpacity>

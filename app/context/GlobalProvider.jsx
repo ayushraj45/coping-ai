@@ -9,9 +9,11 @@ const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
 import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases';
 import { Platform } from "react-native";
+import { platformApiLevel } from "expo-device";
 
 const GlobalProvider = ({ children }) => {
-const API_URL ='https://4idii2equest.coping-ai.com/';
+//const API_URL ='https://4idii2equest.coping-ai.com/';
+const API_URL = 'http://192.168.1.126:5000/';
 const [entries, setEntries] = useState([]);
 const [entriesLength, setEntriesLength] = useState(0);
 const [isLoading, setIsLoading] = useState(true);
@@ -185,7 +187,7 @@ const restoreUserPurchase = async () => {
     setIsSubscribed(false)
   return false;}
   } catch (e) {
-      console.log(e) 
+      console.log('here',e) 
   }
 }
 
@@ -308,7 +310,6 @@ const getAll = async (userid) => {
     .then(async response => {
         if (response.status === 200) {
             //console.log(response.json)
-
             return response.json();
         } else {
             // console.error(`Response error in getAll${type}: ${response.status}`);
@@ -319,6 +320,45 @@ const getAll = async (userid) => {
         console.error('Error fetching in :', error);
         throw error; 
     });
+}
+
+const getAllAssessments = async (userid) => {
+  //console.log('get all happened')
+  return fetch(API_URL + 'users/assessments/' + userid)
+  .then(async response => {
+      if (response.status === 200) {
+          console.log(response.json)
+          const data = await response.json();
+          console.log('data', data)
+          return data;
+      } else {
+          // console.error(`Response error in getAll${type}: ${response.status}`);
+          throw new Error(`Response error in getAllAssessments in GC: `, error);
+      }
+  })
+  .catch(error => {
+      console.error('Error fetching in :', error);
+      throw error; 
+  });
+}
+
+const getAllPlans = async (userid) => {
+  //console.log('get all happened')
+  return fetch(API_URL + 'users/plans/' + userid)
+  .then(async response => {
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('data', data)
+        return data;
+      } else {
+          // console.error(`Response error in getAll${type}: ${response.status}`);
+          throw new Error(`Response error in getAllAssessments in GC: `, error);
+      }
+  })
+  .catch(error => {
+      console.error('Error fetching in :', error);
+      throw error; 
+  });
 }
 
 const addEntry = async (entry) => {
@@ -338,6 +378,191 @@ const addEntry = async (entry) => {
           return console.error('Error in add all: ' + error);
       }
   };
+
+  const addAssessment = async (id) => {
+    const assessmentBody = { // Renamed the body object to avoid confusion with the returned object
+        "assessmentsQuestionIds": [],
+        "userId": id,
+        "averageScore": 0,
+        "purposeScore": 0,
+        "relationshipsScore": 0,
+        "stressScore": 0,
+        "emotionalRegulationScore": 0,
+        "energyScore": 0,
+        "selfEsteemScore": 0
+    }
+
+    try {
+        const response = await fetch(API_URL + 'assessment/createAssessment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(assessmentBody),
+        });
+
+        // Check for HTTP errors (non-2xx status codes)
+        if (!response.ok) {
+            const errorText = await response.text(); // Get response body for more details
+            console.error('Error creating assessment (HTTP status ' + response.status + '):', errorText);
+            // Return null or throw an error to signal failure
+            return null;
+        }
+
+        const data = await response.json();
+        console.log("Assessment creation successful. Backend returned:", data);
+        // Assuming the backend returns an object like { id: '...', ...other_fields }
+        return data; // <-- NOW RETURN THE ENTIRE DATA OBJECT
+    } catch (error) {
+        console.error('Error during addAssessment fetch or JSON parsing: ', error);
+        // Return null or throw an error to signal failure
+        return null;
+    }
+};
+
+const getQuestionsForAssessments = async (assessmentId) => { 
+  console.log('Fetching questions for assessment ID:', assessmentId);
+  try {
+      const response = await fetch( API_URL + 'assessment/getQuestions?assessmentId=' + assessmentId);
+
+      // Check for HTTP errors
+      if (!response.ok) {
+           const errorText = await response.text();
+           console.error('Error fetching questions (HTTP status ' + response.status + '):', errorText);
+           return []; // Return empty array on error fetching questions
+      }
+
+      const data = await response.json();
+      console.log("Successfully fetched questions data:", data);
+      // Assuming data is the array of questions
+      return data;
+  } catch(error) {
+      console.error('Error during getQuestionsForAssessments fetch or JSON parsing: ', error);
+      return []; // Return empty array on any error
+  }
+}
+
+const calculateAssessmentResults = async (id, scores) => {
+  try {
+          const response = await fetch(API_URL + 'assessment/' + id + '/calculate-results', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(scores),
+          });
+          const data = await response.text();
+          return data; // This should be the string with the lowest scored domain
+      } catch (error) {
+          console.error('Error in calculateAssessmentResults: ' + error);
+          // Return a default or error indicator if the API call fails
+          return "Error calculating results.";
+      }
+}
+
+const fetchAssessmentDetails = async (assessmentId) => {
+  return fetch( API_URL + 'assessment/' + assessmentId)
+  .then(response => response.json())
+  .then(data => {
+  //   console.log(data);
+  //console.log('Successfully received the entry from this api ' + data);
+  const foundAssessment = data
+  return foundAssessment;
+})
+.catch(error => console.error('Error fetching: ' + type, error));
+}
+
+const createEmotionalPlan = async (domain) => {
+  if(user){
+    const planBody = { // Renamed the body object to avoid confusion with the returned object
+      "emotionActionStepIds": [],
+      "userId": user.id,
+      "domain": domain,
+      "currentStep": 0,
+      "currentActionDay": 0
+    }
+
+    try {
+      const response = await fetch(API_URL + 'actionplan', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(planBody),
+      });
+
+      // Check for HTTP errors (non-2xx status codes)
+      if (!response.ok) {
+          const errorText = await response.text(); // Get response body for more details
+          console.error('Error creating assessment (HTTP status ' + response.status + '):', errorText);
+          // Return null or throw an error to signal failure
+          return null;
+      }
+
+      const data = await response.json();
+      console.log("Assessment creation successful. Backend returned:", data);
+      // Assuming the backend returns an object like { id: '...', ...other_fields }
+      return data.id; // <-- NOW RETURN THE ENTIRE DATA OBJECT
+  } catch (error) {
+      console.error('Error during addAssessment fetch or JSON parsing: ', error);
+      // Return null or throw an error to signal failure
+      return null;
+  }
+
+
+  }
+  else {
+     console.log('No User Found');
+  }
+
+}
+
+const fetchPlanDetails = async (planId) => {
+  return fetch( API_URL + 'actionplan/' + planId)
+  .then(response => response.json())
+  .then(data => {
+  const foundSteps = data
+  return foundSteps;
+})
+.catch(error => console.error('Error fetching: ' + type, error));
+}
+
+const fetchPlanById = async (planId) => {
+    return fetch( API_URL + 'actionplan/get/' + planId)
+    .then(response => response.json())
+    .then(data => {
+    const plan = data
+    return plan;
+  })
+  .catch(error => console.error('Error fetching: ' + type, error));
+}
+
+const fetchStepDetails = async (stepId) => {
+    return fetch( API_URL + 'actionStep/get/' + stepId)
+    .then(response => response.json())
+    .then(data => {
+    const step = data
+    return step;
+  })
+  .catch(error => console.error('Error fetching: ' + type, error));
+}
+
+const updateStep = async (step) => {
+  try {
+    const response = await fetch(API_URL + 'actionStep', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(step),
+    });
+    const data = await response.json();
+    //console.log('Successfully updated ' + data.id);
+    return data;
+} catch (error) {
+    return console.error('Error updating: ' + error);
+}
+}
 
   const deleteEntry = async (entryId) => {
     return fetch(API_URL + 'entry/user/' + user.id + '/' + entryId + '/', {method: 'DELETE'})
@@ -473,6 +698,18 @@ const getGPTInstaPrompt = async (entryID, prompt) => {
     });
 }
 
+const getGPTEntryForUser = async (entryID) => {
+  return fetch(API_URL + 'gptq/aiEntry?entryId=' + entryID )
+  .then(response => response.text())
+  .then(async data => {
+        return data
+  })
+  .catch(error => {
+      console.error('Error fetching gpt response for ai entry', error);
+      throw error; 
+  });
+}
+
 const updateUser = async (updatedUser) =>{
     try {
       const response = await fetch(API_URL + 'users', {
@@ -530,7 +767,7 @@ const updateUser = async (updatedUser) =>{
     };
 
     return(
-        <GlobalContext.Provider value={{ fetchAllEntries, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, restoreUserPurchase, deleteUser, setIsSubscribed, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{ fetchAllEntries,getAllAssessments,getGPTEntryForUser,getAllPlans,fetchPlanById,fetchPlanDetails,fetchStepDetails, updateStep, getQuestionsForAssessments, fetchAssessmentDetails, createEmotionalPlan, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, restoreUserPurchase, deleteUser, setIsSubscribed, calculateAssessmentResults, addAssessment, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

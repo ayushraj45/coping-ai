@@ -4,13 +4,18 @@ import MoodSvg from '../assets/icons/MoodSvg.svg';
 import Event from '../assets/icons/Event.svg';
 import Today from '../assets/icons/Today.svg';
 import Explore from '../assets/icons/Explore.svg';
+import Scores from '../assets/icons/Scores.svg';
+import NewPath from '../assets/icons/NewPath.svg';
+import AIEntry from '../assets/icons/AIEntry.svg';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { router } from 'expo-router';
+import { useGlobalContext } from '../app/context/GlobalProvider';
 
 const EntryChoice = ({number, title, content, color}) => {
 
     const [titleNext, setTitleNext] = useState(''); 
     const [numberNext, setNumberNext] = useState(number);
+    const { canMakeEntry, isSubscribed } = useGlobalContext();
 
     const setTheTitle = (number) => {
     switch(number){
@@ -29,19 +34,51 @@ const EntryChoice = ({number, title, content, color}) => {
         case 3:      
             return <Explore width={'100%'} height={'100%'}/>
         case 4:
-            return <Today width={'100%'} height={'100%'}/>       
+            return <Today width={'100%'} height={'100%'}/>   
+        case 5:
+            return <NewPath width={'100%'} height={'100%'}/>
+        case 6:
+            return <AIEntry width={'100%'} height={'100%'}/>
+        case 7:
+            return <Explore width={'100%'} height={'100%'}/> 
+        case 8:
+            return <Scores width={'100%'} height={'100%'}/>                                     
         default:
             return null; // Always good to have a default case
     }
   };
 
-  const handleChoicePress = () => {
-    setTheTitle
-    console.log(titleNext,numberNext );
-    router.push({
-        pathname:'/preAiConvo',
-        params: { id: numberNext ,title: titleNext}
-  })}
+  const handleChoicePress = async () => {
+    const allowEntry = await canMakeEntry();
+    if(!isSubscribed){
+        if(number === 5 || number === 6 || number === 7 || number === 8  )
+       router.push({pathname: `/subscribe`})
+        else {
+            setTheTitle
+            console.log(titleNext,numberNext );
+            router.push({
+                pathname:'/preAiConvo',
+                params: { id: numberNext ,title: titleNext}
+            })
+        }
+    }
+    else {
+
+        if(number === 7){
+            router.push('/allPaths')
+        }
+        else if(number === 8){
+            router.push('/allAssessments')
+        }
+        else{
+            setTheTitle
+            console.log(titleNext,numberNext );
+            router.push({
+                pathname:'/preAiConvo',
+                params: { id: numberNext ,title: titleNext}
+            })
+        }
+    }}
 
 
   return (

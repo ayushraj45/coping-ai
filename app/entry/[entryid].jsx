@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet , TouchableWithoutFeedback, TextInput, Keyboard, TouchableOpacity, Modal, KeyboardAvoidingView, ScrollView, Platform} from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet , TouchableWithoutFeedback, TextInput, Keyboard, TouchableOpacity, Modal, KeyboardAvoidingView, ScrollView, Platform, Alert} from 'react-native'
 import React, { useEffect, useState } from 'react'
 //import GradiBackground from '../../components/GradiBackground';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -10,6 +10,7 @@ import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import RotatingLogoLoader from '../../components/RotatingLogoLoader';
 
 const userEntry = () => {
 
@@ -17,7 +18,7 @@ const userEntry = () => {
  // const route = useRoute();
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { getEntry, updateEntry , getEntryById } = useGlobalContext();
+  const { getEntry, updateEntry , getEntryById, getGPTEntryForUser, isSubscribed } = useGlobalContext();
   const [entry, setEntry] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
@@ -28,6 +29,8 @@ const [isLoading, setIsLoading] = useState(false);
   const [showQPopUpText, setShowQPopUpText] = useState([]);
   const [showQPopUp, setShowQPopUp] = useState(false);
   const [hasLocalChanges, setHasLocalChanges] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isAiUpdating, setIsAiUpdating] = useState(false);
 
   useEffect(()  => {
    // console.log('Params received at entryid]:', params);
@@ -45,14 +48,13 @@ const [isLoading, setIsLoading] = useState(false);
   const loadEntry = async () => {
     try {
       const fetchedEntry = await getEntryById(params.entryid);
-      //console.log('fetched entry after making it: ', fetchedEntry)
       if (fetchedEntry) {
         setEntry(fetchedEntry);
         setTitle(fetchedEntry.title);
         setContent(fetchedEntry.content);
         setShowJPPopUpText(fetchedEntry.answers[0]);
         setShowQPopUpText(fetchedEntry.questions);
-
+      } else { // Only load from local if no backend entry
         const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
         if (localEntry) {
           const parsedLocalEntry = JSON.parse(localEntry);
@@ -60,15 +62,17 @@ const [isLoading, setIsLoading] = useState(false);
           setContent(parsedLocalEntry.content);
           setHasLocalChanges(true);
         }
-       }
+      }
     } catch (error) {
       console.error('Error fetching entry:', error);
+    } finally {
+      setIsLoading(false); // Make sure this is in the finally block
     }
-  }
+  };
 
 useEffect(() => {
   const updateInterval = setInterval(() => {
-    if (hasLocalChanges) {
+    if (hasLocalChanges && !isAiUpdating) {
       handleApiUpdate();
     }
   }, 3000); // 30 seconds
@@ -76,7 +80,7 @@ useEffect(() => {
   return () => clearInterval(updateInterval);
 }, [hasLocalChanges, title, content]);
 
-const saveLocally = async () => {
+const saveLocally = async ({ title, content }) => {
   try {
     const localEntry = { title, content };
     await AsyncStorage.setItem(`entry_${params.entryid}`, JSON.stringify(localEntry));
@@ -114,14 +118,78 @@ const handleApiUpdate = async () => {
         setShowQPopUp(true);
       }
 
+      const handleAIEntryPress = async () => {
+
+        if(!isSubscribed){
+          console.log('allow is true')
+          if( entry.questions.length < 8 ){
+            Alert.alert(
+                          'Not enough responses',
+                          'AI Entries are only possible when you have longer conversations. Please set Max Entry more than 5 in Profile to use this feature',
+                          [
+                            {
+                              text: 'Cancel',
+                              style: 'cancel',
+                              onPress: () => false // Prevents default back behavior
+                            },
+                            {
+                              text: 'OK', 
+                              onPress: () => router.push({pathname: `/profile`})
+                            }
+                          ]
+                        );
+          }
+          else {
+            try{
+              console.log('we came here')
+              setLoading(true)
+              setIsAiUpdating(true);
+              const contentToAdd = await getGPTEntryForUser(params.entryid);
+              if(contentToAdd){
+                setContent(content + '\n' + contentToAdd)
+                const newContent = content + '\n' + contentToAdd; 
+                const updatedEntryAfterAi = { ...entry, content:newContent };
+                await updateEntry(updatedEntryAfterAi);
+                await saveLocally({ title, content: newContent });
+              }
+            }
+            catch(error) {
+              console.error('Error saving locally:', error);
+            }
+            finally{
+              setIsAiUpdating(false);
+              
+              setLoading(false);
+            }
+          }
+        }
+        else {
+          Alert.alert(
+            'Remove all limits',
+            'AI Entries are only possible for pro users, please subscribe to use this feature.',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => false // Prevents default back behavior
+              },
+              {
+                text: 'OK', 
+                onPress: () => router.push({pathname: `/subscribe`})
+              }
+            ]
+          );
+        }
+      }
+
   return (
     
       <View style={styles.container}>
       <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'height' : 'height'}
       style={{ flex: 1 }}
       >
-         
+       <RotatingLogoLoader isLoading={loading} />  
             <SafeAreaView style={{ flex: 1,  marginTop: Platform.OS === 'ios' ? 0 : 20,} }>
             <TouchableOpacity onPress={()=> {router.back()}}>
               <Ionicons name="chevron-back" size={24} color="black" />
@@ -137,7 +205,7 @@ const handleApiUpdate = async () => {
                     onChangeText={(text) => {
                       setTitle(text);
                       setHasLocalChanges(true);
-                      saveLocally();
+                       saveLocally({ title: text, content });
                     }}                                   
                 />
                 </View>
@@ -152,11 +220,17 @@ const handleApiUpdate = async () => {
                             <Text>View Questions</Text>
                         </View>
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={handleAIEntryPress}>
+                        <View style={styles.promptButton}>
+                            <Text>Generate Entry with AI</Text>
+                        </View>
+                    </TouchableOpacity>
                     
                 </View>
+                
                 <JPPopUp visible={showJPPopUp} text={showJPPopUpText} onClose={() => setShowJPPopUp(false)} />  
                 <QPopUp visible={showQPopUp} questions={showQPopUpText} onClose={() => setShowQPopUp(false)}/>
-                <ScrollView>
+                <ScrollView showsVerticalScrollIndicator={true}>
                 {/* <DismissKeyboard/> */}
                 <View style={styles.input}>
                 <TextInput
@@ -165,7 +239,7 @@ const handleApiUpdate = async () => {
                     onChangeText={(text) => {
                       setContent(text);
                       setHasLocalChanges(true);
-                      saveLocally();
+                      saveLocally({ title, content: text });
                     }}
                     placeholderTextColor={'grey'}
                     multiline={true}

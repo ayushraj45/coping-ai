@@ -49,7 +49,7 @@ const { width, height } = Dimensions.get('screen');
   }, [searchText, entries]);
 
   const renderItem = ({ item }) => (
-        <JournalEntryPane title={item.title} content={item.content} id={item.id}/>
+        <JournalEntryPane title={item.title} content={item.content} id={item.id} del={true} type={'entry'}/>
   );
 
   return (

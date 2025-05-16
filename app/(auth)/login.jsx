@@ -76,12 +76,15 @@ const login = () => {
           };
 
           const getUserByProvider = async (providerID) => {
+            console.log('provider id', providerID)
             try {
-                const response = await fetch(API_URL + "firebase/login", {
+                console.log(API_URL + "firebase/login");
+                const response = await fetch( API_URL + "firebase/login", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${providerID}`, // Send token in Authorization header
+                    Authorization: `Bearer ${providerID}`,
+                    "Accept": "*/*" // Send token in Authorization header
                   }
                 });
                     if (response.ok) {
