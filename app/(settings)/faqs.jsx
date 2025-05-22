@@ -26,7 +26,7 @@ const FAQList = ({ faqs }) => {
     />
   );
 };
-
+ 
 // Sample Usage
 const FAQsPage = () => {
   const faqData = [
