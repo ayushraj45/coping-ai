@@ -8,6 +8,7 @@ import { ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { useGlobalContext } from '../context/GlobalProvider';
 import { StatusBar } from 'expo-status-bar';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 const register = () => {
 
@@ -19,6 +20,7 @@ const register = () => {
     const [errorMessage, setErrorMessage] = useState(null)
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     const { width , height } = Dimensions.get('screen');
+    const analytics = getAnalytics();
 
     const signUp = async () => {
         setLoading(true)
@@ -61,6 +63,7 @@ const register = () => {
        
         if(createdUser){
             try{
+                await logEvent(analytics,'signUp');
                 setLoading(false)
                  login(createdUser)
           router.push({

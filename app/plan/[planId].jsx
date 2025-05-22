@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router'; // Assuming expo-router for route params
 import { useGlobalContext } from '../context/GlobalProvider';
 import RotatingLogoLoader from '../../components/RotatingLogoLoader';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 
 const { width, height } = Dimensions.get('screen');
@@ -105,17 +106,30 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
 
   const PlanPage = () => {
     const { planId } = useLocalSearchParams(); // Get planId from route parameters
-    const { fetchPlanDetails, fetchPlanById } = useGlobalContext(); // Get user data from global context
+    const { fetchPlanDetails, fetchPlanById, checkIfSub } = useGlobalContext(); // Get user data from global context
   
     const [planData, setPlanData] = useState(null);
     const [stepsData, setStepsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-  
+    const analytics = getAnalytics();
+
+
+    useEffect(() => {
+      const allowPage = async () => {
+        const allow = await checkIfSub();
+        if (!allow) {
+          router.replace("/subscribe");
+        }
+      }
+      allowPage();
+    }, [router]);
+
     useEffect(() => {
         console.log(planId);
 
       const fetchData = async () => {
+
         try {
           setLoading(true);
             const steps = await fetchPlanDetails(planId); // Or pass plan.emotionActionStepIds
@@ -128,6 +142,8 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
           setError("Failed to load plan details.");
           console.error(err);
         } finally {
+          await logEvent(analytics,'init_newPath');
+
           setLoading(false);
         }
       };
@@ -198,7 +214,7 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
                 showsText={true}
                 formatText={() => `${Math.round(planProgress * 100)}%`} // Display percentage
                 textStyle={styles.circularProgressText}
-                color="#C8E8EA" // Light blue color
+                color="#0B243C" // Light blue color
                 unfilledColor="#FFEECD" // Unfilled color
                 borderWidth={0}
                 thickness={width * 0.02} // Dynamic thickness

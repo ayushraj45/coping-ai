@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Purchases, { PurchasesOffering } from 'react-native-purchases';
 import { useGlobalContext } from '../app/context/GlobalProvider';
 import RotatingLogoLoader from './RotatingLogoLoader';
-
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 const PricingOption = ({ identifier, title, description, isSelected, onSelect, isBestValue,perweek, price, packageType }) => (
     <TouchableOpacity 
@@ -24,16 +24,19 @@ const PricingPanel = () => {
   const [products, setProducts] = useState([]);
   const { updateUserSubscriptionStatus } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
+  const analytics = getAnalytics();
 
 
   useEffect(() => {
     console.log('Current products:', products);
+    
   }, [products]);
 
 
   useEffect(() => {
 
     const productSetup = async () => {
+    await logEvent(analytics,'init_SubscriptionPage');
       try {
         const result = await fetchProducts();
         if (result) {  // Only set isLoading false if we successfully got products
@@ -132,6 +135,7 @@ const PricingPanel = () => {
   const onPurchase = async (pack) => {
 		// Purchase the package
     setIsLoading(true)
+    await logEvent(analytics, 'click_purchasePlan');
     try{
       await Purchases.purchasePackage(pack).then(()=>{setIsLoading(false)});
 

@@ -9,6 +9,7 @@ const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
 import Purchases, { LOG_LEVEL, PurchasesOffering } from 'react-native-purchases';
 import { Platform } from "react-native";
+import {getAnalytics, setUserId} from '@react-native-firebase/analytics';
 import { platformApiLevel } from "expo-device";
 
 const GlobalProvider = ({ children }) => {
@@ -201,6 +202,10 @@ const login = async (userData) => {
         //console.log('user at GC login function ' + JSON.stringify(user))
         setIsLoggedIn(true);
         getNotificationToken();
+        if(userData.id){
+          const analytics = getAnalytics();
+          await setUserId(analytics, String(userData.id));
+        }
         //console.log(expoPushToken);
         fetchAllEntries(user)
       } catch (error) {
@@ -457,6 +462,12 @@ const calculateAssessmentResults = async (id, scores) => {
           console.error('Error in calculateAssessmentResults: ' + error);
           // Return a default or error indicator if the API call fails
           return "Error calculating results.";
+      }
+      finally{
+        const updatedUser = await getUserById(user.id)
+        if(updatedUser){
+          setUser({...user, ...updatedUser})
+        }  
       }
 }
 
@@ -743,6 +754,16 @@ const updateUser = async (updatedUser) =>{
       else return false;
     }
 
+    const checkIfSub = async () => {
+      if (user) {
+        if (isSubscribed){
+          return true;
+        }
+        else return false;
+      }
+      else return false;
+    }
+
   // useEffect(() => {
   //   // This will run whenever user.remainingFreeEntries changes
   //   if(user) {console.log('Remaining free entries:', user.remainingFreeEntries);}
@@ -767,7 +788,7 @@ const updateUser = async (updatedUser) =>{
     };
 
     return(
-        <GlobalContext.Provider value={{ fetchAllEntries,getAllAssessments,getGPTEntryForUser,getAllPlans,fetchPlanById,fetchPlanDetails,fetchStepDetails, updateStep, getQuestionsForAssessments, fetchAssessmentDetails, createEmotionalPlan, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, restoreUserPurchase, deleteUser, setIsSubscribed, calculateAssessmentResults, addAssessment, initializing, user, isLoading}}>
+        <GlobalContext.Provider value={{ fetchAllEntries,getAllAssessments,getGPTEntryForUser,getAllPlans,fetchPlanById,checkIfSub,fetchPlanDetails,fetchStepDetails, updateStep, getQuestionsForAssessments, fetchAssessmentDetails, createEmotionalPlan, entries, API_URL, expoPushToken, notification, error, addEntry,getEntryById, updateUserSubscriptionStatus,getUserById, getGPTResponse, getGPTInstaPrompt, getEntry, canMakeEntry, updateEntry, deleteEntry, login, logout, refreshUserData, refreshEntries, updateUser, addFeedback, restoreUserPurchase, deleteUser, setIsSubscribed, calculateAssessmentResults, addAssessment, initializing, user, isLoading}}>
             {children}
         </GlobalContext.Provider>
     )

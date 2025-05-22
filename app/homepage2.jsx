@@ -9,12 +9,13 @@ import HomepageBot from '../assets/icons/HomepageBot.svg';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import EntryChoice from '../components/EntryChoice';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import preAiConvo from './preAiConvo';
 import { useGlobalContext } from './context/GlobalProvider';
 import SubscribePrompt from '../components/SubscribePrompt';
 import MentalHealthScoreComponent from '../components/MentalHealthScoreComponent';
 import DashboardComponent from '../components/DashboardComponent';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -36,37 +37,48 @@ const homepage2 = () => {
     const [currentPath, setCurrentPath] = useState("Start an assessment to get path");
     const [mhScore, setMhScore] = useState(0);
     const[lastId, setLastId] = useState(0);
+    const [clickDisabled, setClickDisabled] = useState(true);
+    const analytics = getAnalytics();
 
     // callbacks
     // const handleSheetChanges = useCallback((index) => {
     //   console.log('handleSheetChanges', index);
     // }, []);
 
-    useEffect(() => {
-        if(user){
-          setUserName(user.username)
-          setUserId(user.id);
-          setStreak(user.streak); 
-          setWordsWritten(user.wordsWritten)
-          const entriesLength = Array.isArray(user.entryIds) ? user.entryIds.length : 0;
-          setEntryLength(entriesLength);
-          setMhScore(user.currentDomainScore);
-          
-          if(user.currentEmotionPlan){
-            setCurrentPath(user.currentEmotionPlan);
-            const lastIdNow = user.emotionPlanIds[user.emotionPlanIds.length - 1];
-            console.log(lastIdNow)
-            setLastId(lastIdNow)
-          }
+    const setUserDetails = async () => {
+      if(user){
+        setUserName(user.username)
+        setUserId(user.id);
+        setStreak(user.streak); 
+        setWordsWritten(user.wordsWritten)
+        const entriesLength = Array.isArray(user.entryIds) ? user.entryIds.length : 0;
+        setEntryLength(entriesLength);
+        setMhScore(user.currentDomainScore);
+        
+        if(user.currentEmotionPlan){
+          setClickDisabled(false);
+          setCurrentPath(user.currentEmotionPlan);
+          const lastIdNow = user.emotionPlanIds[user.emotionPlanIds.length - 1];
+          console.log(lastIdNow)
+          setLastId(lastIdNow)
         }
+      }
+    }
+
+    useEffect(() => {
+      setUserDetails();
       }, [user]);
 
-
+  useFocusEffect(
+    useCallback(() => {
+      setUserDetails();
+    }, [])
+  );
 
     const handleOpenSheet = useCallback( async () => {
         const allowEntry = await canMakeEntry();
         console.log('can make entry here: ',allowEntry)
-
+        await logEvent(analytics, 'init_entry')
         if(allowEntry){
            setTimeout(() => {
       bottomSheetRef?.current?.expand();
@@ -81,7 +93,7 @@ const homepage2 = () => {
       const handleOpenProSheet = useCallback( async () => {
         // const allowEntry = await canMakeEntry();
         // console.log('can make entry here: ',allowEntry)
-
+        await logEvent(analytics,'init_proFeatures')
         
            setTimeout(() => {
             bottomSheetProRef?.current?.expand();
@@ -101,7 +113,7 @@ const homepage2 = () => {
             <SubscribePrompt visible={showSubsribeNotice} onClose={() => {setShowSubscribeNotice(false)}} text={"You have reached your weekly limit of free entries. Please subscribe to enjoy unlimited entries and more!"}/>
             {/* Header and Text */}
             <View style={styles.headerSection}>
-                <Text style={styles.appName}>Coping.ai</Text>
+                {/* <Text style={styles.appName}>Coping.ai</Text> */}
                 <Text style={styles.welcomeText}>Welcome Back,</Text>
                 <Text style={styles.usernameText}>{username}</Text> 
             </View>
@@ -122,7 +134,8 @@ const homepage2 = () => {
             <MentalHealthScoreComponent
                 score={mhScore} // Pass placeholder or actual score
                 currentPath={currentPath} 
-                lastPlanId={lastId}// Pass placeholder or actual path
+                lastPlanId={lastId}
+                disabled={clickDisabled}// Pass placeholder or actual path
             />
             {/* Buttons Section */}
             <View style={styles.buttonsSection}>
@@ -193,7 +206,7 @@ const homepage2 = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'white',
+      backgroundColor: '#FEF8EC',
     },
     handleStyle:{
         backgroundColor: "#ECE0C8", // Color from original styles

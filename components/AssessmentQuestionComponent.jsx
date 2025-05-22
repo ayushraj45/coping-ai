@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.05, // Dynamic horizontal padding
     paddingTop: height * 0.02, // Dynamic padding top
     justifyContent: 'space-between', // Distribute space vertically
-    marginHorizontal:10,
+    //marginHorizontal:10,
   },
   header: {
     flexDirection: 'row',
@@ -153,13 +153,14 @@ const styles = StyleSheet.create({
     fontFamily: 'bSemi', // Your specified font
     color: '#011C2D', // Color from your theme
     textAlign: 'center', // Ensure title is centered
-    flex: 1, // Allow title to take up available space
+   // flex: 1, // Allow title to take up available space
   },
   progressBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between', // Space out progress bar and text
-    marginBottom: height * 0.03, // Dynamic margin below progress bar
+    marginBottom: height * 0.03, 
+    paddingHorizontal:10,// Dynamic margin below progress bar
     width: '100%', // Ensure container takes full width
   },
   progressBar: {
@@ -186,6 +187,7 @@ const styles = StyleSheet.create({
     lineHeight: height * 0.04, // Dynamic line height for readability
   },
   optionsContainer: {
+    paddingHorizontal:10,
     marginBottom: height * 0.04, // Dynamic margin below options
   },
   optionButton: {

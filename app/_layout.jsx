@@ -49,7 +49,7 @@ const RootLayout = () => {
       <Stack initialRouteName= "index">
         <Stack.Screen name="index" options={{headerShown: false}}/>
         <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-        <Stack.Screen name="homepage2" options={{headerShown: false}}/>
+        <Stack.Screen name="homepage2" options={{headerShown: true, headerStyle:{backgroundColor: '#FEF8EC'}, headerTitle:'Coping.ai', headerTitleStyle:{fontFamily:'bSemi', fontWeight:'bold', fontSize:28}, headerBackVisible:false}}/>
         <Stack.Screen name="allEntries" options={{headerShown: false}}/>
         <Stack.Screen name="settings" options={{headerShown: false}}/>
         <Stack.Screen name="assessmentScreen" options={{headerShown: false}}/>

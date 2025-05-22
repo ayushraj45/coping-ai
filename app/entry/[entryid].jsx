@@ -18,7 +18,7 @@ const userEntry = () => {
  // const route = useRoute();
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { getEntry, updateEntry , getEntryById, getGPTEntryForUser, isSubscribed } = useGlobalContext();
+  const { getEntry, updateEntry , getEntryById, getGPTEntryForUser, checkIfSub } = useGlobalContext();
   const [entry, setEntry] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
@@ -45,30 +45,57 @@ const [isLoading, setIsLoading] = useState(false);
     }
   }, []);
 
+  // const loadEntry = async () => {
+  //   try {
+  //     const fetchedEntry = await getEntryById(params.entryid);
+  //     const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
+  //     if (localEntry) {
+  //       const parsedLocalEntry = JSON.parse(localEntry);
+  //       setTitle(parsedLocalEntry.title);
+  //       setContent(parsedLocalEntry.content);
+  //       setHasLocalChanges(true);
+  //       if (fetchedEntry) {
+  //         setShowJPPopUpText(fetchedEntry.answers[0]);
+  //         setShowQPopUpText(fetchedEntry.questions);
+  //       }
+  //     }
+  //     else {
+  //       if (fetchedEntry) {
+  //         setEntry(fetchedEntry);
+  //         setTitle(fetchedEntry.title);
+  //         setContent(fetchedEntry.content);
+  //         setShowJPPopUpText(fetchedEntry.answers[0]);
+  //         setShowQPopUpText(fetchedEntry.questions);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching entry:', error);
+  //   } finally {
+  //     setIsLoading(false); // Make sure this is in the finally block
+  //   }
+  // };
+
   const loadEntry = async () => {
     try {
-      const fetchedEntry = await getEntryById(params.entryid);
-      if (fetchedEntry) {
-        setEntry(fetchedEntry);
-        setTitle(fetchedEntry.title);
-        setContent(fetchedEntry.content);
-        setShowJPPopUpText(fetchedEntry.answers[0]);
-        setShowQPopUpText(fetchedEntry.questions);
-      } else { // Only load from local if no backend entry
-        const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
-        if (localEntry) {
-          const parsedLocalEntry = JSON.parse(localEntry);
-          setTitle(parsedLocalEntry.title);
-          setContent(parsedLocalEntry.content);
-          setHasLocalChanges(true);
-        }
-      }
+    const fetchedEntry = await getEntryById(params.entryid);
+    if (fetchedEntry) {   
+    setEntry(fetchedEntry);
+    setTitle(fetchedEntry.title);
+    setContent(fetchedEntry.content);    
+    setShowJPPopUpText(fetchedEntry.answers[0]);        
+    setShowQPopUpText(fetchedEntry.questions);
+
+     const localEntry = await AsyncStorage.getItem(`entry_${params.entryid}`);
+
+    if (localEntry) {
+    const parsedLocalEntry = JSON.parse(localEntry);    
+    setTitle(parsedLocalEntry.title);
+    setContent(parsedLocalEntry.content);
+    setHasLocalChanges(true);
+    }}
     } catch (error) {
-      console.error('Error fetching entry:', error);
-    } finally {
-      setIsLoading(false); // Make sure this is in the finally block
-    }
-  };
+    console.error('Error fetching entry:', error);
+    }}
 
 useEffect(() => {
   const updateInterval = setInterval(() => {
@@ -119,10 +146,10 @@ const handleApiUpdate = async () => {
       }
 
       const handleAIEntryPress = async () => {
-
-        if(!isSubscribed){
+        const allowAiEntry = await checkIfSub();
+        if(allowAiEntry){
           console.log('allow is true')
-          if( entry.questions.length < 8 ){
+          if( entry.questions.length < 7 ){
             Alert.alert(
                           'Not enough responses',
                           'AI Entries are only possible when you have longer conversations. Please set Max Entry more than 5 in Profile to use this feature',
@@ -190,7 +217,7 @@ const handleApiUpdate = async () => {
       style={{ flex: 1 }}
       >
        <RotatingLogoLoader isLoading={loading} />  
-            <SafeAreaView style={{ flex: 1,  marginTop: Platform.OS === 'ios' ? 0 : 20,} }>
+            <SafeAreaView style={{ flex: 1,  marginTop: Platform.OS === 'ios' ? 0 : 20} }>
             <TouchableOpacity onPress={()=> {router.back()}}>
               <Ionicons name="chevron-back" size={24} color="black" />
             </TouchableOpacity>

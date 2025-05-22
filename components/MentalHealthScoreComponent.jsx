@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('screen');
 
-const MentalHealthScoreComponent = ({ score, currentPath, lastPlanId }) => {
+const MentalHealthScoreComponent = ({ score, currentPath, lastPlanId, disabled }) => {
     const progress = score / 100; // Calculate progress percentage
   
     return (
@@ -25,7 +25,7 @@ const MentalHealthScoreComponent = ({ score, currentPath, lastPlanId }) => {
           style={{ marginVertical: height * 0.01 }} // Dynamic vertical margin
         />
         <Text style={mentalHealthStyles.currentPathLabel}>Current Path</Text>
-        <TouchableOpacity onPress={()=>{router.push({pathname: `/plan/[id]`, params: { id: lastPlanId}})}} >
+        <TouchableOpacity disabled={disabled} onPress={()=>{router.push({pathname: `/plan/[id]`, params: { id: lastPlanId}})}} >
         <View style={mentalHealthStyles.currentPathBox}>
           <Ionicons name="sparkles" size={24} color="black" />
           <Text style={mentalHealthStyles.currentPathText}> {currentPath}</Text>

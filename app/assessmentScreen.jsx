@@ -4,6 +4,7 @@ import AssessmentQuestionComponent from '../components/AssessmentQuestionCompone
 import { useGlobalContext } from './context/GlobalProvider';
 import { router, useLocalSearchParams } from 'expo-router';
 import RotatingLogoLoader from '../components/RotatingLogoLoader';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 
 const AssessmentScreen = () => {
@@ -14,12 +15,15 @@ const AssessmentScreen = () => {
   const [assessmentId, setAssessmentId] = useState();
   const {addAssessment, getQuestionsForAssessments, calculateAssessmentResults} = useGlobalContext();
   const params = useLocalSearchParams();
+  const analytics = getAnalytics();
 
   
 
   // --- You will implement this part to fetch your questions ---
   useEffect(() => {
     const fetchQuestions = async () => {
+     
+
       try {
         const assessment = await addAssessment(params.id);
 
@@ -64,6 +68,10 @@ const AssessmentScreen = () => {
         console.error('Error fetching questions:', error);
         setLoading(false); // Handle error state appropriately
       }
+      finally{
+        setLoading(false);
+        await logEvent(analytics,'init_assessment');
+      }
     };
 
     fetchQuestions();
@@ -87,6 +95,10 @@ const AssessmentScreen = () => {
       handleSubmitAssessment();
     }
   };
+
+  const handleBackPress = () => {
+    setCurrentQuestionIndex(prevIndex => prevIndex - 1);
+  }
 
   // Handler to submit all answers
   const handleSubmitAssessment = async () => {
@@ -124,6 +136,7 @@ const AssessmentScreen = () => {
       totalQuestions={questions.length}
       currentQuestionIndex={currentQuestionIndex}
       results={handleSubmitAssessment}
+      onBack={handleBackPress}
     />
   );
 };

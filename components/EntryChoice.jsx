@@ -15,7 +15,7 @@ const EntryChoice = ({number, title, content, color}) => {
 
     const [titleNext, setTitleNext] = useState(''); 
     const [numberNext, setNumberNext] = useState(number);
-    const { canMakeEntry, isSubscribed } = useGlobalContext();
+    const { checkIfSub } = useGlobalContext();
 
     const setTheTitle = (number) => {
     switch(number){
@@ -49,8 +49,9 @@ const EntryChoice = ({number, title, content, color}) => {
   };
 
   const handleChoicePress = async () => {
-    const allowEntry = await canMakeEntry();
-    if(!isSubscribed){
+    const allowEntry = await checkIfSub();
+    if(!allowEntry){
+       
         if(number === 5 || number === 6 || number === 7 || number === 8  )
        router.push({pathname: `/subscribe`})
         else {

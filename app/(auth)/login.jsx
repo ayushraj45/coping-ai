@@ -9,8 +9,9 @@ import { router } from 'expo-router'
 import { useGlobalContext } from '../context/GlobalProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
-const login = () => {
+const Login = () => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -18,6 +19,7 @@ const login = () => {
     const [errorMessage, setErrorMessage] = useState(null)
     const {login, API_URL} = useGlobalContext();
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const analytics = getAnalytics();
 
     const signIn = async () => {
         const response = auth().signInWithEmailAndPassword(email, password)
@@ -50,6 +52,7 @@ const login = () => {
                 console.log('sql user ' + JSON.stringify(loggedUser) );
                 if(loggedUser){
                     try{
+                        await logEvent(analytics,'login');
                         setLoading(false)
                         login(loggedUser)
                 router.replace({
@@ -219,7 +222,7 @@ const login = () => {
   )
 }
 
-export default login;
+export default Login;
 
 const { width , height } = Dimensions.get('window');
 

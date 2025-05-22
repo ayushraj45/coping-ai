@@ -98,7 +98,7 @@ const AssessmentResultPage = () => {
     }, [assessmentId]);
 
   const handleBackPress = () => {
-    router.back(); // Example: go back one screen
+    router.push({ pathname: `/homepage2`}); // Example: go back one screen
   };
 
  const handleCreatePlan = async () => {
@@ -152,7 +152,7 @@ const AssessmentResultPage = () => {
    
     <GestureHandlerRootView style={styles.container}>
          <SafeAreaView style={styles.containerMargin}>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         {/* Back button */}
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     fontFamily: 'bSemi', // Your specified font
     color: '#011C2D', // Color from your theme
     textAlign: 'center', // Ensure title is centered
-    flex: 1, // Allow title to take up available space
+   // flex: 1, // Allow title to take up available space
   },
   contentContainer: {
     flex: 1,
