@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import GradiBackground from '../../components/GradiBackground'
 import { RFPercentage } from 'react-native-responsive-fontsize'
@@ -13,6 +13,8 @@ import { router } from 'expo-router'
 const subscribe = () => {
 
   return (
+    <SafeAreaView style={styles.container}>
+
     
       <View style={styles.container}>
                   <TouchableOpacity onPress={()=> {router.back()}} style={{alignSelf:'flex-start'}}>
@@ -30,7 +32,7 @@ const subscribe = () => {
         </View>
         <PricingPanel/>       
       </View>
-   
+    </SafeAreaView>
   )
 }
 
@@ -42,6 +44,7 @@ const styles = StyleSheet.create({
      justifyContent: "center",
      alignItems: "center",
      backgroundColor: '#FEF8EC',
+     paddingTop: Platform.OS === 'android' ? 10 : 0
   },
   headerText:{
     alignItems: "center",

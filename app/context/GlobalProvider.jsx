@@ -13,8 +13,8 @@ import {getAnalytics, setUserId} from '@react-native-firebase/analytics';
 import { platformApiLevel } from "expo-device";
 
 const GlobalProvider = ({ children }) => {
-//const API_URL ='https://4idii2equest.coping-ai.com/';
-const API_URL = 'http://192.168.1.126:5000/';
+const API_URL ='https://4idii2equest.coping-ai.com/';
+//const API_URL = 'http://192.168.1.167:5000/';
 const [entries, setEntries] = useState([]);
 const [entriesLength, setEntriesLength] = useState(0);
 const [isLoading, setIsLoading] = useState(true);

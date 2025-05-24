@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native'; // Using ProgressBarAndroid for example, you might need a different one for iOS or cross-platform
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Platform } from 'react-native'; // Using ProgressBarAndroid for example, you might need a different one for iOS or cross-platform
 import * as Progress from 'react-native-progress';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FEF8EC", // Background color from your theme
     paddingHorizontal: width * 0.05, // Dynamic horizontal padding
-    paddingTop: height * 0.02, // Dynamic padding top
+    paddingTop: Platform.OS === 'android' ? height * 0.05 : height * 0.02, // Dynamic padding top
     justifyContent: 'space-between', // Distribute space vertically
     //marginHorizontal:10,
   },

@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FEF8EC", // Background color from your theme
     paddingHorizontal: width * 0.05, // Dynamic horizontal padding
-    paddingTop: height * 0.02, // Dynamic padding top
+    paddingTop: Platform.OS === 'android' ? height * 0.05 : height * 0.02, // Dynamic padding top
     justifyContent: 'space-between', // Distribute space vertically
   },
   loadingContainer: {

@@ -10,7 +10,7 @@ const PricingOption = ({ identifier, title, description, isSelected, onSelect, i
       style={[styles.pricingOption, isSelected && styles.selectedOption]}
       onPress={onSelect}
     >
-      {title === 'Coping Pro Annual' ? <Text style={styles.optionTitle}>{price} / Per Year </Text> : <Text style={styles.optionTitle}>{price} / Per Month </Text>} 
+      {identifier === 'pro_annual' || identifier === 'pro:pro-annual' ? <Text style={styles.optionTitle}>{price} / Per Year </Text> : <Text style={styles.optionTitle}>{price} / Per Month </Text>} 
       <Text style={styles.perweek}>{perweek} / Per Week </Text>
       <Text style={styles.optionDescription}>{title}</Text>
       <Text style={styles.optionDescription}>{description}</Text>
@@ -165,6 +165,7 @@ const PricingPanel = () => {
           title={pack.product.title}
           description={pack.product.description}
           price={pack.product.priceString}
+          identifier={pack.product.identifier}
           perweek={pack.product.pricePerWeekString}
           isSelected={selectedPlan?.identifier === '$rc_annual'}
           onSelect={() => { onPurchase(pack) }}        

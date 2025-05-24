@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableOpacity, ActivityIndicator, FlatList, Platform } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
     const isActive = step.active; // Use 'active' field from EmotionalStep
     const isCompleted = step.completed; // Use 'isCompleted' field from EmotionalStep
     const isCurrent = index === currentStepIndex; // Check if this is the current step based on index
+    const {checkIfSub } = useGlobalContext(); // Get user data from global context
   
     // Determine dot and line color based on status
     const dotColor = isCompleted ? '#8FD19E' : (isActive ? '#011C2D' : '#FFEECD'); // Completed green, Active dark blue, Inactive light yellow
@@ -24,6 +25,15 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
     const boxBackgroundColor = isCompleted ? '#8FD19E' : '#C8E8EA'; // Completed green, Active/Inactive light blue
     const boxOpacity = isActive ? 1 : (isCompleted ? 1 : 0.6); // Full opacity for active/completed, reduced for inactive
   
+    const allowPage = async () => {
+      const allow = await checkIfSub();
+      if (!allow) {
+        router.replace("/subscribe");
+      }
+      else {
+        if (step.completed || step.active) 
+          {router.push({ pathname: `/step/[id]`, params: { id: id } });}
+    }}
   
     return (
       <View style={stepItemStyles.container}>
@@ -40,9 +50,7 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
   
         {/* Right side: Step Rectangle */}
         <TouchableOpacity onPress={() => {
-                if (step.completed || step.active) {
-                    router.push({ pathname: `/step/[id]`, params: { id: id } });
-                }
+               allowPage();
             }} style={[stepItemStyles.rightContainer, { backgroundColor: boxBackgroundColor, opacity: boxOpacity }]}>
         <View>
           <Text style={stepItemStyles.stepInfo}>Step: {step.stepNumber} Day: {step.actionDay}</Text>
@@ -115,15 +123,15 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
     const analytics = getAnalytics();
 
 
-    useEffect(() => {
-      const allowPage = async () => {
-        const allow = await checkIfSub();
-        if (!allow) {
-          router.replace("/subscribe");
-        }
-      }
-      allowPage();
-    }, [router]);
+    // useEffect(() => {
+    //   const allowPage = async () => {
+    //     const allow = await checkIfSub();
+    //     if (!allow) {
+    //       router.replace("/subscribe");
+    //     }
+    //   }
+    //   allowPage();
+    // }, [router]);
 
     useEffect(() => {
         console.log(planId);
@@ -255,7 +263,7 @@ const StepItem = ({ step, index, currentStepIndex, totalSteps, id }) => {
       flex: 1,
       backgroundColor: "#FEF8EC", // Background color from your theme
       paddingHorizontal: width * 0.05, // Dynamic horizontal padding
-      paddingTop: height * 0.02, // Dynamic padding top
+      paddingTop: Platform.OS === 'android' ? height * 0.05 : height * 0.02, // Dynamic padding top
     },
     loadingContainer: {
       flex: 1,

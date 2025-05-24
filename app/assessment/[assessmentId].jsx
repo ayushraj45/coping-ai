@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, SafeAreaView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FEF8EC", // Background color from your theme
     paddingHorizontal: width * 0.05, // Dynamic horizontal padding
-    paddingTop: height * 0.02, // Dynamic padding top
+    paddingTop: Platform.OS === 'android' ? height * 0.05 : height * 0.02 // Dynamic padding top
   },
   containerMargin:{
     marginHorizontal:10,

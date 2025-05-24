@@ -44,6 +44,9 @@ const FAQsPage = () => {
     { question: 'What can I customise on Coping?', answer: 'We aim to offer you maximum flexibility. For now you can change the maximum number of questions you want AI to ask you before creating a prompt for you.'},
     { question: 'I do not like something about Coping, what can I do?', answer: 'Coping is a young app and we are activiely looking to improve based on your feedbacks. Please use the feedback section and we will try our best to include your suggestions as soon as possible.'},
     { question: 'How can I change my password?', answer: 'Click on Forget Password on the Login screen to get a link to reset your password.'},
+    { question: 'What is Streak on the homepage?', answer: 'Streak measures how often you are journaling, if you miss a day the streak will reset to 0. You might get a notification to maintain your streak if you are about to miss it.'},
+    { question: 'What is counted in the Words Written counter on the homepage?', answer: 'Words Written counts the words you write in your netry along with any words you write as a part of a response with the AI.'},
+
   ];
 
   return (

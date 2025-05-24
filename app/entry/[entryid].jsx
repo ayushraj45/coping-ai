@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet , TouchableWithoutFeedback, TextInput, Keyboard, TouchableOpacity, Modal, KeyboardAvoidingView, ScrollView, Platform, Alert} from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet , TouchableWithoutFeedback, TextInput, Keyboard, TouchableOpacity, Modal, KeyboardAvoidingView, ScrollView, Platform, Alert, Dimensions} from 'react-native'
 import React, { useEffect, useState } from 'react'
 //import GradiBackground from '../../components/GradiBackground';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -11,6 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import RotatingLogoLoader from '../../components/RotatingLogoLoader';
+
+const { width, height } = Dimensions.get('screen');
+
 
 const userEntry = () => {
 
@@ -239,17 +242,20 @@ const handleApiUpdate = async () => {
                 <View style={styles.promptButtonContainer}>
                     <TouchableOpacity onPress={handleJPPress}>
                         <View style={styles.promptButton}>
-                            <Text>View Prompt</Text>
+                            <Text>View{'\n'}
+                              Prompt</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleQPress}>
                         <View style={styles.promptButton}>
-                            <Text>View Questions</Text>
+                            <Text>View{'\n'}
+                              Questions</Text>
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleAIEntryPress}>
                         <View style={styles.promptButton}>
-                            <Text>Generate Entry with AI</Text>
+                            <Text>Generate Entry {'\n'}
+                              with AI</Text>
                         </View>
                     </TouchableOpacity>
                     
@@ -299,6 +305,7 @@ const styles = StyleSheet.create({
         justifyContent:'flex-start',
         padding:5,
         paddingLeft:15,
+        width: width,
     },
     promptButton:{
         borderRadius:14,
@@ -306,6 +313,8 @@ const styles = StyleSheet.create({
         padding:5,
         paddingHorizontal:7,
         marginRight:10,
+        fontSize: RFPercentage(1.5),
+       // width: RFPercentage(12),
     },
 
 input:{
