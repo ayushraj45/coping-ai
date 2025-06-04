@@ -2,7 +2,7 @@
   "expo": {
     "name": "Coping-ai",
     "slug": "coping-ai",
-    "version": "1.0.0",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -11,7 +11,10 @@
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
-      "bundleIdentifier": "com.ayushrajp.copingai"
+      "bundleIdentifier": "com.ayushrajp.copingai",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -32,17 +35,17 @@
       "@react-native-firebase/crashlytics",
       [
         "expo-build-properties",
-          {
-            "ios": {
-              "useFrameworks": "static",
-              "flipper": true
-            },
-            "android": {
-              "kotlinVersion": "1.9.25",
-              "kotlinCompilerExtensionVersion": "1.5.15"
-            }
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "flipper": true
+          },
+          "android": {
+            "kotlinVersion": "1.9.25",
+            "kotlinCompilerExtensionVersion": "1.5.15"
           }
-        ], 
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
