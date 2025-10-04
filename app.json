@@ -2,7 +2,7 @@
   "expo": {
     "name": "Coping-ai",
     "slug": "coping-ai",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -22,7 +22,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ayushrajp.copingai"
+
+      "package": "com.ayushrajp.copingai",
+      "targetSdkVersion": 35
     },
     "web": {
       "bundler": "metro",
