@@ -1,7 +1,9 @@
 **Coping AI – Intelligent Journaling Companion**
+
 Coping AI is a cross‑platform React Native journaling app that combines AI‑assisted reflection, mood tracking, and behavioral insights to help users build healthier emotional coping habits on iOS and Android.​
 
 **Key Features**
+  
    AI‑assisted journaling – Context‑aware prompts and smart suggestions that help users reflect, reframe thoughts, and capture emotions more clearly.​
    
    Personalized insights – Uses past entries, moods, and themes to surface patterns and tailored coping suggestions over time.​
@@ -13,8 +15,9 @@ Coping AI is a cross‑platform React Native journaling app that combines AI‑a
    Secure, private by design – User data is handled on the client and via secure APIs, with configuration ready for production‑grade auth and storage.​
 
 **Architecture Overview**
-   Coping AI is structured as a modular React Native app using Expo, with a clear separation between UI components, navigation, hooks, and utility layers.​
    
+   Coping AI is structured as a modular React Native app using Expo, with a clear separation between UI components, navigation, hooks, and utility layers.​
+
    Framework: React Native with Expo (managed workflow) for rapid mobile development and OTA updates.​
    
    Language: Primarily JavaScript with TypeScript support enabled for type safety and scalability.​
@@ -42,6 +45,7 @@ Coping AI is a cross‑platform React Native journaling app that combines AI‑a
    This structure is designed to be production‑ready and easily extendable with additional modules such as analytics, authentication, and offline sync.​
 
 **AI and Personalization**
+   
    Coping AI is built around the idea of personalized mental wellness support rather than generic journaling.​
    
    Adaptive prompts – Journaling prompts can evolve based on recent entries, tone, or themes such as stress, gratitude, or productivity.​
@@ -55,11 +59,12 @@ Coping AI is a cross‑platform React Native journaling app that combines AI‑a
    
    Push notifications – Integrated support for mobile notifications (tested on iOS and Android) to remind users to journal or revisit insights.​
    
-   Analytics ready – The app is wired to support analytics events (for example, session start, journaling streaks, feature usage) and has previously been integrated with tools such as Firebase Analytics.​
+   Analytics ready – The app is wired to support analytics events (for example, session start, journaling streaks, feature usage) and has previously been integrated with tools such as Firebase       Analytics.​
 
 This allows tracking of engagement, retention, and feature adoption in a privacy‑aware manner.​
 
 **Tech Stack**
+  
    Mobile framework: React Native (Expo)​
    
    Languages: JavaScript, TypeScript​
@@ -75,6 +80,7 @@ This allows tracking of engagement, retention, and feature adoption in a privacy
    This stack demonstrates experience with modern mobile development, cross‑platform architecture, TypeScript adoption, and production build tooling.​
 
 **Getting Started (Local Development)**
+  
    Clone the repository
    
    bash
@@ -103,6 +109,7 @@ This allows tracking of engagement, retention, and feature adoption in a privacy
    This command moves the starter example code to app-example/ and prepares a fresh app/ directory.​
 
 **Production Readiness**
+   
    Coping AI has been incrementally evolved with several production‑focused improvements and iterations.​
    
    Multiple release iterations – The version_2_0 branch and commits reflect ongoing improvements in UX, stability, and features.​
